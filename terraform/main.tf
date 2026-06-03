@@ -26,5 +26,11 @@ resource "local_file" "hello" {
 
 resource "aws_s3_bucket" "demo" {
   bucket = "jsdev305-aws-serverless-pipeline-demo"
+
+  tags = {
+    Environment = "dev"
+    Project     = "aws-serverless-pipeline"
+    ManagedBy   = "terraform"
+  }
 }
 
