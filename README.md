@@ -96,8 +96,8 @@ provider "aws" {
 
 Learned:
 
-- `required_providers` downloads plugins
-- `provider` configures plugins
+- `required_providers` downloads provider plugins
+- `provider` configures provider settings
 - Terraform communicates with AWS through providers
 
 ### First AWS Resource
@@ -110,42 +110,168 @@ resource "aws_s3_bucket" "demo" {
 }
 ```
 
-Workflow:
+Learned:
 
-```bash
-terraform init
-terraform plan
-terraform apply
+- Terraform resources map to real AWS infrastructure
+- Resource references avoid hardcoded values
+- Terraform builds a dependency graph automatically
+
+### S3 Tags
+
+Added metadata tags to the bucket:
+
+```hcl
+tags = {
+  Environment = "dev"
+  ManagedBy   = "terraform"
+  Project     = "aws-serverless-pipeline"
+}
 ```
 
-Verified:
+Learned:
 
-- Bucket created in AWS
-- Resource tracked in Terraform state
+- Tags help organize cloud resources
+- Tags are commonly used for ownership, environments, and cost allocation
+
+### S3 Versioning
+
+Enabled bucket versioning:
+
+```hcl
+resource "aws_s3_bucket_versioning" "demo" {
+  bucket = aws_s3_bucket.demo.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+```
+
+Learned:
+
+- S3 preserves historical object versions
+- Updating an object creates a new version instead of overwriting the previous one
+- Version IDs are returned by AWS and tracked in Terraform state
+
+### S3 Server-Side Encryption
+
+Enabled default encryption:
+
+```hcl
+resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
+  bucket = aws_s3_bucket.demo.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+```
+
+Learned:
+
+- Objects are encrypted automatically when stored
+- AES256 uses AWS-managed encryption keys
+- Encryption can be configured as infrastructure
+
+### S3 Lifecycle Rules
+
+Added lifecycle management:
+
+```hcl
+resource "aws_s3_bucket_lifecycle_configuration" "demo" {
+  bucket = aws_s3_bucket.demo.id
+
+  rule {
+    id     = "cleanup-old-objects"
+    status = "Enabled"
+
+    expiration {
+      days = 365
+    }
+  }
+}
+```
+
+Learned:
+
+- Lifecycle rules automate storage management
+- Old objects can be archived or deleted automatically
+- Lifecycle policies help control long-term storage costs
+
+### S3 Object Uploads
+
+Uploaded objects using Terraform:
+
+```hcl
+resource "aws_s3_object" "sample" {
+  bucket = aws_s3_bucket.demo.id
+
+  key    = "sample.txt"
+  source = "sample.txt"
+
+  etag = filemd5("sample.txt")
+}
+```
+
+Learned:
+
+- Terraform can manage S3 objects
+- Hashes can be used to detect file changes
+- Updating the local file creates a new object version in S3
+- Terraform state tracks the current S3 version ID
 
 ---
 
 ## Current Infrastructure
 
-- Local File
-  - `local_file.hello`
+### Local Resources
 
-- AWS
-  - `aws_s3_bucket.demo`
+- `local_file.hello`
+
+### AWS Resources
+
+- `aws_s3_bucket.demo`
+- `aws_s3_bucket_versioning.demo`
+- `aws_s3_bucket_server_side_encryption_configuration.demo`
+- `aws_s3_bucket_lifecycle_configuration.demo`
+- `aws_s3_object.sample`
+
+### Current S3 Features
+
+- Versioning Enabled
+- AES256 Encryption Enabled
+- Lifecycle Rule (365-day expiration)
+- Managed Object Uploads
+- Terraform State Tracking
+
+---
+
+## Key Concepts Learned
+
+- Desired State vs Actual State
+- Terraform State Management
+- Providers vs Resources
+- Resource References
+- Dependency Graphs
+- Infrastructure Drift Detection
+- Hash-Based Change Detection (`filemd5`)
+- S3 Object Versioning
+- Server-Side Encryption
+- Lifecycle Management
 
 ---
 
 ## Next Steps
 
-- S3 Versioning
-- S3 Encryption
 - Terraform Variables
 - Terraform Outputs
-- IAM Best Practices
+- Terraform Modules
+- IAM Roles and Policies
 - Lambda Functions
-- S3 Event Triggers
-- Serverless Data Pipeline
-
-```
-
-```
+- S3 Event Notifications
+- CloudWatch Logging
+- Serverless Data Processing Pipeline
+- Remote Terraform State
+- CI/CD Deployment Pipeline
