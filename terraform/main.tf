@@ -56,12 +56,19 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
 resource "aws_s3_bucket_lifecycle_configuration" "demo" {
   bucket = aws_s3_bucket.demo.id
   rule {
-   id = "cleanup-old-objects"
-   status = "Enabled"
+    id     = "cleanup-old-objects"
+    status = "Enabled"
 
-  expiration {
-     days = 365
-   } 
- }
+    expiration {
+      days = 365
+    }
+  }
 }
 
+
+resource "aws_s3_object" "sample" {
+  bucket = aws_s3_bucket.demo.id
+  key    = "sample.txt"
+  source = "sample.txt"
+  etag   = filemd5("sample.txt")
+}
