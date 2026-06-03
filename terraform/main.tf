@@ -53,3 +53,15 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "demo" {
+  bucket = aws_s3_bucket.demo.id
+  rule {
+   id = "cleanup-old-objects"
+   status = "Enabled"
+
+  expiration {
+     days = 365
+   } 
+ }
+}
+
