@@ -1,3 +1,9 @@
+import json
+
+
 def handler(event, context):
-    print("Hello from Lambda")
-    return {"statusCode": 200, "message": "Lambda executed successfully"}
+    print("Lambda invoked")
+
+    print(json.dumps(event, indent=2))
+
+    return {"statusCode": 200, "message": "Success"}
