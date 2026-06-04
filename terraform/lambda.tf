@@ -40,3 +40,24 @@ resource "aws_lambda_function" "demo" {
   timeout     = 5
   memory_size = 128
 }
+
+resource "aws_lambda_permission" "allow_s3" {
+  statement_id  = "AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.demo.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.demo.arn
+
+}
+
+resource "aws_s3_bucket_notification" "demo" {
+  bucket = aws_s3_bucket.demo.id
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.demo.arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [
+    aws_lambda_permission.allow_s3
+  ]
+}
