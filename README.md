@@ -465,3 +465,70 @@ CloudWatch Logs
 - CloudWatch Logging
 - AWS Region Awareness
 - Race Conditions in Infrastructure Provisioning
+
+### IAM Authorization Patterns (Future Topics)
+
+Scenario:
+
+Bucket contains different classes of data:
+
+- public/\*
+- finance/\*
+- admin/\*
+
+Different identities may require different permissions:
+
+Users:
+
+- Default users may access public/\*
+- Finance users may access finance/\*
+- Admins may access all resources
+
+Lambda:
+
+- Can have completely different permissions than human users
+- May read uploads/\*
+- May write processed/\*
+- May access DynamoDB while users cannot
+
+Key Learning:
+
+AWS always evaluates permissions based on the identity making the request.
+
+Examples:
+
+AWS CLI
+→ User IAM permissions
+
+Lambda
+→ Lambda execution role permissions
+
+EC2
+→ EC2 instance role permissions
+
+Important Question During Debugging:
+
+"Who is making this request?"
+
+Least Privilege:
+
+Grant only the actions required:
+
+- s3:GetObject
+- s3:PutObject
+- dynamodb:PutItem
+
+Avoid broad permissions such as:
+
+- s3:\*
+- -
+
+Scalability:
+
+Prefer prefixes/folders:
+
+- public/\*
+- finance/\*
+- admin/\*
+
+instead of managing permissions for thousands of individual files.
