@@ -224,7 +224,131 @@ Learned:
 
 ---
 
+### IAM Role for Lambda
+
+Created a dedicated execution role for Lambda:
+
+```hcl
+resource "aws_iam_role" "lambda_role" {
+  name = "aws-serverless-pipeline-lambda-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+
+        Effect = "Allow"
+
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+```
+
+Learned:
+
+- IAM Roles and Policies are separate resources
+- Trust Policies define who can assume a role
+- Permission Policies define what a role can do
+- Lambda assumes an IAM Role during execution
+- AWS follows a deny-by-default security model
+
+### Lambda CloudWatch Permissions
+
+Attached AWS managed logging permissions:
+
+```hcl
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  role       = aws_iam_role.lambda_role.name
+
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+```
+
+Learned:
+
+- Policies can exist independently from roles
+- Roles can exist independently from policies
+- Attaching a policy grants permissions to the role
+- Lambda requires CloudWatch permissions to write logs
+- Principle of Least Privilege
+
+### First Lambda Function
+
+Created and deployed a Python Lambda function:
+
+```python
+def handler(event, context):
+    print("Hello from Lambda")
+
+    return {
+        "statusCode": 200,
+        "message": "Lambda executed successfully"
+    }
+```
+
+Terraform configuration:
+
+```hcl
+resource "aws_lambda_function" "demo" {
+  function_name = "aws-serverless-pipeline-demo"
+
+  role = aws_iam_role.lambda_role.arn
+
+  runtime = "python3.13"
+
+  handler = "handler.handler"
+
+  filename = "../lambda/handler.zip"
+
+  source_code_hash = filebase64sha256("../lambda/handler.zip")
+
+  timeout     = 5
+  memory_size = 128
+}
+```
+
+Learned:
+
+- Lambda code is deployed as a zip package
+- AWS uses the format `file.function` for handlers
+- Resource references connect infrastructure components
+- `source_code_hash` allows Terraform to detect code changes
+- Lambda code, IAM, and infrastructure are managed independently
+
+### CloudWatch Logs
+
+Successfully executed the Lambda function and verified logging.
+
+Learned:
+
+- CloudWatch is AWS's native observability platform
+- Lambda automatically creates log groups and log streams
+- Application logs are available through CloudWatch Logs
+- Logging is essential for debugging serverless applications
+- CloudWatch provides logs, metrics, dashboards, and alarms
+
+```
+
+```
+
 ## Current Infrastructure
+
+### AWS Resources
+
+- aws_s3_bucket.demo
+- aws_s3_bucket_versioning.demo
+- aws_s3_bucket_server_side_encryption_configuration.demo
+- aws_s3_bucket_lifecycle_configuration.demo
+- aws_s3_object.sample
+- aws_iam_role.lambda_role
+- aws_iam_role_policy_attachment.lambda_basic_execution
+- aws_lambda_function.demo
 
 ### Local Resources
 
@@ -265,13 +389,13 @@ Learned:
 
 ## Next Steps
 
+- S3 Event Notifications
+- Lambda Triggers
+- Processing S3 Upload Events
 - Terraform Variables
 - Terraform Outputs
 - Terraform Modules
-- IAM Roles and Policies
-- Lambda Functions
-- S3 Event Notifications
-- CloudWatch Logging
-- Serverless Data Processing Pipeline
 - Remote Terraform State
+- CloudWatch Metrics and Alarms
+- Serverless Data Processing Pipeline
 - CI/CD Deployment Pipeline
