@@ -23,8 +23,12 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Lambda artifacts
+lambda/handler.zip
+lambda/build/
 
 # Python
 .venv/
 __pycache__/
 *.pyc
+build/

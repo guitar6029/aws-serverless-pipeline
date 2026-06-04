@@ -29,7 +29,7 @@ resource "aws_lambda_function" "demo" {
 
   role = aws_iam_role.lambda_role.arn
 
-  runtime = "python3.13"
+  runtime = "python3.12"
 
   handler = "handler.handler"
 

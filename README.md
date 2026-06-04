@@ -532,3 +532,18 @@ Prefer prefixes/folders:
 - admin/\*
 
 instead of managing permissions for thousands of individual files.
+
+Single Lambda vs Multiple Lambdas
+
+Start with a single Lambda when:
+
+- Same trigger
+- Same permissions
+- Same deployment lifecycle
+
+Split into multiple Lambdas when:
+
+- Different permissions
+- Different event sources
+- Different business domains
+- Different scaling requirements

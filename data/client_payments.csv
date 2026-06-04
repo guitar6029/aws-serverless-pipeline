@@ -1,0 +1,16 @@
+payment_id,client,amount,date,status
+1001,acme corp,1250.50,2026-04-15,paid
+1002,globex,500.00,2026-04-16,pending
+1003,initech,75.25,2026-04-17,failed
+1004,umbrella,2100.00,2026-04-18,paid
+1005,stark industries,875.75,2026-04-19,paid
+1006,wayne enterprises,1500.00,2026-04-20,pending
+1007,hooli,250.00,2026-04-21,failed
+1008,vehement capital,920.10,2026-04-22,paid
+1009,massive dynamic,110.00,2026-04-23,pending
+1010,soylent,45.50,2026-04-24,paid
+1011,wonka industries,330.25,2026-04-25,paid
+1012,oscorp,1999.99,2026-04-26,failed
+1013,cyberdyne,420.00,2026-04-27,paid
+1014,bluth company,780.00,2026-04-28,pending
+1015,pied piper,67.89,2026-04-29,paid

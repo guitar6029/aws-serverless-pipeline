@@ -1,5 +1,5 @@
 import boto3
-
+from processors.payments import parse_payment_row
 
 def handler(event, context):
 
@@ -10,17 +10,23 @@ def handler(event, context):
     bucket_name = record["s3"]["bucket"]["name"]
     object_key = record["s3"]["object"]["key"]
 
+    
     response = s3.get_object(Bucket=bucket_name, Key=object_key)
-
-    # For this learning project we read the entire object into memory.
-    # This is acceptable for small text files, but large files should be
-    # streamed and processed incrementally.
-    content = response["Body"].read().decode("utf-8")
 
     print(f"Bucket: {bucket_name}")
     print(f"Object: {object_key}")
-
-    print("File contents:")
-    print(content)
+    
+    first_row = True
+    
+    for line in response["Body"].iter_lines():
+        decoded_line = line.decode("utf-8").strip()
+        if not decoded_line:
+            continue
+        # skip the header row
+        if first_row:
+            first_row = False
+            continue
+        payment = parse_payment_row(decoded_line)
+        print(payment)
 
     return {"statusCode": 200}
