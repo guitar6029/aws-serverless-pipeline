@@ -61,3 +61,29 @@ resource "aws_s3_bucket_notification" "demo" {
     aws_lambda_permission.allow_s3
   ]
 }
+
+
+resource "aws_iam_role_policy" "lambda_s3_read" {
+  name = "lambda-s3-read"
+
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "s3:GetObject"
+        ]
+
+        Resource = [
+          "${aws_s3_bucket.demo.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
