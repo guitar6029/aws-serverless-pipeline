@@ -2,8 +2,14 @@ import json
 
 
 def handler(event, context):
-    print("Lambda invoked")
 
-    print(json.dumps(event, indent=2))
+    record = event["Records"][0]
 
-    return {"statusCode": 200, "message": "Success"}
+    bucket_name = record["s3"]["bucket"]["name"]
+
+    object_key = record["s3"]["object"]["key"]
+
+    print(f"Bucket: {bucket_name}")
+    print(f"Object: {object_key}")
+
+    return {"statusCode": 200}
