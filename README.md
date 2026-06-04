@@ -100,22 +100,6 @@ Learned:
 - `provider` configures provider settings
 - Terraform communicates with AWS through providers
 
-### First AWS Resource
-
-Created first AWS-managed resource:
-
-```hcl
-resource "aws_s3_bucket" "demo" {
-  bucket = "jsdev305-aws-serverless-pipeline-demo"
-}
-```
-
-Learned:
-
-- Terraform resources map to real AWS infrastructure
-- Resource references avoid hardcoded values
-- Terraform builds a dependency graph automatically
-
 ### S3 Tags
 
 Added metadata tags to the bucket:
@@ -333,22 +317,92 @@ Learned:
 - Logging is essential for debugging serverless applications
 - CloudWatch provides logs, metrics, dashboards, and alarms
 
+````
+
+
+### Lambda Invocation Permissions
+
+Granted S3 permission to invoke the Lambda function:
+
+```hcl
+resource "aws_lambda_permission" "allow_s3" {
+  statement_id  = "AllowExecutionFromS3"
+
+  action = "lambda:InvokeFunction"
+
+  function_name = aws_lambda_function.demo.function_name
+
+  principal = "s3.amazonaws.com"
+
+  source_arn = aws_s3_bucket.demo.arn
+}
+````
+
+Learned:
+
+- Lambda execution permissions are separate from IAM execution roles
+- S3 requires explicit permission before invoking Lambda
+- `source_arn` restricts invocation to a specific bucket
+- AWS validates permissions before creating event notifications
+- Resource relationships often require multiple Terraform resources
+
+### S3 Event Notifications
+
+Connected S3 uploads to Lambda using bucket notifications:
+
+```hcl
+resource "aws_s3_bucket_notification" "demo" {
+  bucket = aws_s3_bucket.demo.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.demo.arn
+
+    events = [
+      "s3:ObjectCreated:*"
+    ]
+  }
+
+  depends_on = [
+    aws_lambda_permission.allow_s3
+  ]
+}
 ```
 
+Learned:
+
+- S3 can emit events when objects are created
+- Event notifications connect AWS services together
+- Event-driven architecture reduces manual operations
+- Notifications define WHEN actions occur
+- Permissions define WHO may perform actions
+
+### Terraform Dependencies
+
+Learned the difference between implicit and explicit dependencies.
+
+Implicit dependency example:
+
+```hcl
+role = aws_iam_role.lambda_role.arn
 ```
+
+Explicit dependency example:
+
+```hcl
+depends_on = [
+  aws_lambda_permission.allow_s3
+]
+```
+
+Learned:
+
+- Terraform builds a dependency graph automatically
+- Resource references create implicit dependencies
+- `depends_on` creates explicit dependencies
+- Explicit dependencies help prevent race conditions
+- Some AWS relationships are not automatically discoverable by Terraform
 
 ## Current Infrastructure
-
-### AWS Resources
-
-- aws_s3_bucket.demo
-- aws_s3_bucket_versioning.demo
-- aws_s3_bucket_server_side_encryption_configuration.demo
-- aws_s3_bucket_lifecycle_configuration.demo
-- aws_s3_object.sample
-- aws_iam_role.lambda_role
-- aws_iam_role_policy_attachment.lambda_basic_execution
-- aws_lambda_function.demo
 
 ### Local Resources
 
@@ -361,6 +415,23 @@ Learned:
 - `aws_s3_bucket_server_side_encryption_configuration.demo`
 - `aws_s3_bucket_lifecycle_configuration.demo`
 - `aws_s3_object.sample`
+- `aws_iam_role.lambda_role`
+- `aws_iam_role_policy_attachment.lambda_basic_execution`
+- `aws_lambda_function.demo`
+- `aws_lambda_permission.allow_s3`
+- `aws_s3_bucket_notification.demo`
+
+### Current Architecture
+
+```text
+S3 Upload
+      ↓
+S3 Event Notification
+      ↓
+Lambda Function
+      ↓
+CloudWatch Logs
+```
 
 ### Current S3 Features
 
@@ -368,9 +439,8 @@ Learned:
 - AES256 Encryption Enabled
 - Lifecycle Rule (365-day expiration)
 - Managed Object Uploads
+- Event Notifications
 - Terraform State Tracking
-
----
 
 ## Key Concepts Learned
 
@@ -378,24 +448,20 @@ Learned:
 - Terraform State Management
 - Providers vs Resources
 - Resource References
+- Implicit Dependencies
+- Explicit Dependencies (`depends_on`)
 - Dependency Graphs
 - Infrastructure Drift Detection
 - Hash-Based Change Detection (`filemd5`)
 - S3 Object Versioning
 - Server-Side Encryption
 - Lifecycle Management
-
----
-
-## Next Steps
-
+- IAM Roles vs Policies
+- Trust Policies
+- Lambda Execution Roles
+- Event-Driven Architecture
 - S3 Event Notifications
-- Lambda Triggers
-- Processing S3 Upload Events
-- Terraform Variables
-- Terraform Outputs
-- Terraform Modules
-- Remote Terraform State
-- CloudWatch Metrics and Alarms
-- Serverless Data Processing Pipeline
-- CI/CD Deployment Pipeline
+- Lambda Invocation Permissions
+- CloudWatch Logging
+- AWS Region Awareness
+- Race Conditions in Infrastructure Provisioning
