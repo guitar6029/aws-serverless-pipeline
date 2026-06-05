@@ -48,3 +48,28 @@ resource "aws_iam_role_policy" "lambda_s3_read" {
     ]
   })
 }
+
+resource "aws_iam_role_policy" "lambda_dynamodb_write" {
+  name = "lambda-dynamodb-write"
+
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "dynamodb:PutItem"
+        ]
+
+        Resource = [
+          aws_dynamodb_table.payments.arn
+        ]
+      }
+    ]
+  })
+}
