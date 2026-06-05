@@ -16,15 +16,14 @@ Learning project focused on Terraform, AWS fundamentals, and serverless architec
 
 ### Terraform Basics
 
-- Installed Terraform
-- Created first Terraform configuration
-- Learned:
-  - Desired State (`main.tf`)
-  - State File (`terraform.tfstate`)
-  - `terraform init`
-  - `terraform plan`
-  - `terraform apply`
-  - `terraform destroy`
+Learned:
+
+- Desired State (`main.tf`)
+- State File (`terraform.tfstate`)
+- `terraform init`
+- `terraform plan`
+- `terraform apply`
+- `terraform destroy`
 
 ### Local Provider
 
@@ -53,31 +52,13 @@ Completed initial AWS account setup:
 - Access keys generated
 - AWS CLI configured
 
-Verified AWS authentication:
+Verified authentication:
 
 ```bash
-aws sts get-caller-identity
-```
-
-### AWS CLI Setup
-
-```bash
-sudo apt install unzip
-
-unzip awscliv2.zip
-
-sudo ./aws/install
-
-aws --version
-
-aws configure
-
 aws sts get-caller-identity
 ```
 
 ### AWS Provider
-
-Added AWS provider:
 
 ```hcl
 terraform {
@@ -96,13 +77,23 @@ provider "aws" {
 
 Learned:
 
-- `required_providers` downloads provider plugins
-- `provider` configures provider settings
-- Terraform communicates with AWS through providers
+- Terraform providers are plugins
+- Providers configure communication with AWS
+- Terraform manages infrastructure through providers
 
-### S3 Tags
+---
 
-Added metadata tags to the bucket:
+## S3 Storage
+
+### Bucket
+
+```hcl
+resource "aws_s3_bucket" "demo" {
+  bucket = "jsdev305-aws-serverless-pipeline-demo"
+}
+```
+
+### Tags
 
 ```hcl
 tags = {
@@ -112,14 +103,7 @@ tags = {
 }
 ```
 
-Learned:
-
-- Tags help organize cloud resources
-- Tags are commonly used for ownership, environments, and cost allocation
-
-### S3 Versioning
-
-Enabled bucket versioning:
+### Versioning
 
 ```hcl
 resource "aws_s3_bucket_versioning" "demo" {
@@ -131,15 +115,7 @@ resource "aws_s3_bucket_versioning" "demo" {
 }
 ```
 
-Learned:
-
-- S3 preserves historical object versions
-- Updating an object creates a new version instead of overwriting the previous one
-- Version IDs are returned by AWS and tracked in Terraform state
-
-### S3 Server-Side Encryption
-
-Enabled default encryption:
+### Encryption
 
 ```hcl
 resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
@@ -153,15 +129,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
 }
 ```
 
-Learned:
-
-- Objects are encrypted automatically when stored
-- AES256 uses AWS-managed encryption keys
-- Encryption can be configured as infrastructure
-
-### S3 Lifecycle Rules
-
-Added lifecycle management:
+### Lifecycle Rules
 
 ```hcl
 resource "aws_s3_bucket_lifecycle_configuration" "demo" {
@@ -180,57 +148,20 @@ resource "aws_s3_bucket_lifecycle_configuration" "demo" {
 
 Learned:
 
+- Versioning preserves historical object versions
+- Encryption protects data at rest
 - Lifecycle rules automate storage management
-- Old objects can be archived or deleted automatically
-- Lifecycle policies help control long-term storage costs
-
-### S3 Object Uploads
-
-Uploaded objects using Terraform:
-
-```hcl
-resource "aws_s3_object" "sample" {
-  bucket = aws_s3_bucket.demo.id
-
-  key    = "sample.txt"
-  source = "sample.txt"
-
-  etag = filemd5("sample.txt")
-}
-```
-
-Learned:
-
-- Terraform can manage S3 objects
-- Hashes can be used to detect file changes
-- Updating the local file creates a new object version in S3
-- Terraform state tracks the current S3 version ID
+- Tags improve organization and cost tracking
 
 ---
 
-### IAM Role for Lambda
+## IAM and Security
 
-Created a dedicated execution role for Lambda:
+### Lambda Execution Role
 
 ```hcl
 resource "aws_iam_role" "lambda_role" {
   name = "aws-serverless-pipeline-lambda-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-
-        Effect = "Allow"
-
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      }
-    ]
-  })
 }
 ```
 
@@ -239,12 +170,9 @@ Learned:
 - IAM Roles and Policies are separate resources
 - Trust Policies define who can assume a role
 - Permission Policies define what a role can do
-- Lambda assumes an IAM Role during execution
-- AWS follows a deny-by-default security model
+- AWS follows a deny-by-default model
 
-### Lambda CloudWatch Permissions
-
-Attached AWS managed logging permissions:
+### CloudWatch Permissions
 
 ```hcl
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
@@ -254,101 +182,65 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 }
 ```
 
+### S3 Read Permissions
+
+Lambda execution role granted:
+
+```text
+s3:GetObject
+```
+
 Learned:
 
-- Policies can exist independently from roles
-- Roles can exist independently from policies
-- Attaching a policy grants permissions to the role
-- Lambda requires CloudWatch permissions to write logs
+- Lambda execution permissions are independent from invocation permissions
 - Principle of Least Privilege
+- AWS evaluates permissions based on the calling identity
 
-### First Lambda Function
+---
 
-Created and deployed a Python Lambda function:
+## Lambda
+
+### Initial Function
 
 ```python
 def handler(event, context):
     print("Hello from Lambda")
 
     return {
-        "statusCode": 200,
-        "message": "Lambda executed successfully"
+        "statusCode": 200
     }
-```
-
-Terraform configuration:
-
-```hcl
-resource "aws_lambda_function" "demo" {
-  function_name = "aws-serverless-pipeline-demo"
-
-  role = aws_iam_role.lambda_role.arn
-
-  runtime = "python3.13"
-
-  handler = "handler.handler"
-
-  filename = "../lambda/handler.zip"
-
-  source_code_hash = filebase64sha256("../lambda/handler.zip")
-
-  timeout     = 5
-  memory_size = 128
-}
 ```
 
 Learned:
 
 - Lambda code is deployed as a zip package
-- AWS uses the format `file.function` for handlers
-- Resource references connect infrastructure components
-- `source_code_hash` allows Terraform to detect code changes
-- Lambda code, IAM, and infrastructure are managed independently
+- AWS handlers follow `file.function`
+- Terraform can deploy application code
+- `source_code_hash` detects code changes
 
 ### CloudWatch Logs
 
-Successfully executed the Lambda function and verified logging.
-
 Learned:
 
-- CloudWatch is AWS's native observability platform
-- Lambda automatically creates log groups and log streams
-- Application logs are available through CloudWatch Logs
-- Logging is essential for debugging serverless applications
+- Lambda automatically writes logs to CloudWatch
 - CloudWatch provides logs, metrics, dashboards, and alarms
+- Logging is critical for debugging serverless applications
 
-````
+---
 
+## Event-Driven Architecture
 
 ### Lambda Invocation Permissions
 
-Granted S3 permission to invoke the Lambda function:
-
 ```hcl
 resource "aws_lambda_permission" "allow_s3" {
-  statement_id  = "AllowExecutionFromS3"
-
-  action = "lambda:InvokeFunction"
-
-  function_name = aws_lambda_function.demo.function_name
-
-  principal = "s3.amazonaws.com"
-
-  source_arn = aws_s3_bucket.demo.arn
+  action        = "lambda:InvokeFunction"
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.demo.arn
 }
-````
-
-Learned:
-
-- Lambda execution permissions are separate from IAM execution roles
-- S3 requires explicit permission before invoking Lambda
-- `source_arn` restricts invocation to a specific bucket
-- AWS validates permissions before creating event notifications
-- Resource relationships often require multiple Terraform resources
+```
 
 ### S3 Event Notifications
-
-Connected S3 uploads to Lambda using bucket notifications:
 
 ```hcl
 resource "aws_s3_bucket_notification" "demo" {
@@ -372,21 +264,21 @@ Learned:
 
 - S3 can emit events when objects are created
 - Event notifications connect AWS services together
-- Event-driven architecture reduces manual operations
+- Event-driven systems reduce manual workflows
 - Notifications define WHEN actions occur
 - Permissions define WHO may perform actions
 
-### Terraform Dependencies
+---
 
-Learned the difference between implicit and explicit dependencies.
+## Terraform Dependencies
 
-Implicit dependency example:
+Implicit dependency:
 
 ```hcl
 role = aws_iam_role.lambda_role.arn
 ```
 
-Explicit dependency example:
+Explicit dependency:
 
 ```hcl
 depends_on = [
@@ -396,144 +288,184 @@ depends_on = [
 
 Learned:
 
-- Terraform builds a dependency graph automatically
+- Terraform builds dependency graphs automatically
 - Resource references create implicit dependencies
 - `depends_on` creates explicit dependencies
 - Explicit dependencies help prevent race conditions
-- Some AWS relationships are not automatically discoverable by Terraform
+
+---
+
+## Payment Processing Pipeline
+
+Implemented an event-driven CSV ingestion workflow using S3, Lambda, Boto3, and Pydantic.
+
+### Architecture
+
+```text
+client_payments.csv
+        ↓
+        S3
+        ↓
+Event Notification
+        ↓
+     Lambda
+        ↓
+S3 GetObject
+        ↓
+CSV Parsing
+        ↓
+Pydantic Validation
+        ↓
+CloudWatch Logs
+```
+
+### Lambda Structure
+
+```text
+lambda/
+├── handler.py
+├── models/
+│   └── payment.py
+├── processors/
+│   └── payments.py
+├── pyproject.toml
+└── uv.lock
+```
+
+### Components
+
+#### Payment Model
+
+```python
+class Payment(BaseModel):
+    payment_id: int
+    client: str
+    amount: float
+    date: date
+    status: PaymentStatus
+```
+
+#### Payment Status
+
+```python
+class PaymentStatus(str, Enum):
+    PAID = "paid"
+    PENDING = "pending"
+    FAILED = "failed"
+```
+
+#### Processing Flow
+
+- Read object from S3
+- Stream rows line-by-line
+- Skip CSV header
+- Parse payment records
+- Validate with Pydantic
+- Log results to CloudWatch
+
+### Runtime Compatibility Debugging
+
+Issue:
+
+```text
+No module named 'pydantic_core._pydantic_core'
+```
+
+Root Cause:
+
+- Local Python 3.12
+- Lambda Python 3.13
+- Pydantic Core compiled for Python 3.12
+
+Resolution:
+
+- Updated Lambda runtime to Python 3.12
+
+Learned:
+
+- Runtime versions matter
+- Deployment artifacts include dependencies
+- Build and runtime environments should match
+- CloudWatch is essential for debugging deployment issues
+
+---
 
 ## Current Infrastructure
 
-### Local Resources
-
-- `local_file.hello`
-
 ### AWS Resources
 
-- `aws_s3_bucket.demo`
-- `aws_s3_bucket_versioning.demo`
-- `aws_s3_bucket_server_side_encryption_configuration.demo`
-- `aws_s3_bucket_lifecycle_configuration.demo`
-- `aws_s3_object.sample`
-- `aws_iam_role.lambda_role`
-- `aws_iam_role_policy_attachment.lambda_basic_execution`
-- `aws_lambda_function.demo`
-- `aws_lambda_permission.allow_s3`
-- `aws_s3_bucket_notification.demo`
+- aws_s3_bucket.demo
+- aws_s3_bucket_versioning.demo
+- aws_s3_bucket_server_side_encryption_configuration.demo
+- aws_s3_bucket_lifecycle_configuration.demo
+- aws_s3_object.sample
+- aws_iam_role.lambda_role
+- aws_iam_role_policy_attachment.lambda_basic_execution
+- aws_iam_role_policy.lambda_s3_read
+- aws_lambda_function.demo
+- aws_lambda_permission.allow_s3
+- aws_s3_bucket_notification.demo
 
 ### Current Architecture
 
 ```text
-S3 Upload
-      ↓
-S3 Event Notification
-      ↓
-Lambda Function
-      ↓
+client_payments.csv
+        ↓
+        S3
+        ↓
+Event Notification
+        ↓
+     Lambda
+        ↓
+S3 GetObject
+        ↓
+CSV Parsing
+        ↓
+Pydantic Validation
+        ↓
 CloudWatch Logs
 ```
 
-### Current S3 Features
-
-- Versioning Enabled
-- AES256 Encryption Enabled
-- Lifecycle Rule (365-day expiration)
-- Managed Object Uploads
-- Event Notifications
-- Terraform State Tracking
+---
 
 ## Key Concepts Learned
 
-- Desired State vs Actual State
 - Terraform State Management
 - Providers vs Resources
-- Resource References
-- Implicit Dependencies
-- Explicit Dependencies (`depends_on`)
+- Desired State vs Actual State
 - Dependency Graphs
-- Infrastructure Drift Detection
-- Hash-Based Change Detection (`filemd5`)
-- S3 Object Versioning
-- Server-Side Encryption
-- Lifecycle Management
+- Implicit vs Explicit Dependencies
+- Infrastructure Drift
+- S3 Versioning
+- S3 Encryption
+- Lifecycle Policies
 - IAM Roles vs Policies
 - Trust Policies
 - Lambda Execution Roles
-- Event-Driven Architecture
-- S3 Event Notifications
 - Lambda Invocation Permissions
+- Event-Driven Architecture
 - CloudWatch Logging
-- AWS Region Awareness
-- Race Conditions in Infrastructure Provisioning
+- Lambda Deployment Packaging
+- Runtime Compatibility
+- Dependency Management
+- Pydantic Validation
+- CSV Processing Pipelines
 
-### IAM Authorization Patterns (Future Topics)
+---
 
-Scenario:
+## Future Experiments
 
-Bucket contains different classes of data:
+### IAM Authorization Patterns
 
-- public/\*
-- finance/\*
-- admin/\*
+Topics to explore:
 
-Different identities may require different permissions:
+- Prefix-based authorization
+- Role separation
+- Fine-grained S3 access control
+- Least Privilege strategies
+- Human vs Service identities
 
-Users:
-
-- Default users may access public/\*
-- Finance users may access finance/\*
-- Admins may access all resources
-
-Lambda:
-
-- Can have completely different permissions than human users
-- May read uploads/\*
-- May write processed/\*
-- May access DynamoDB while users cannot
-
-Key Learning:
-
-AWS always evaluates permissions based on the identity making the request.
-
-Examples:
-
-AWS CLI
-→ User IAM permissions
-
-Lambda
-→ Lambda execution role permissions
-
-EC2
-→ EC2 instance role permissions
-
-Important Question During Debugging:
-
-"Who is making this request?"
-
-Least Privilege:
-
-Grant only the actions required:
-
-- s3:GetObject
-- s3:PutObject
-- dynamodb:PutItem
-
-Avoid broad permissions such as:
-
-- s3:\*
-- -
-
-Scalability:
-
-Prefer prefixes/folders:
-
-- public/\*
-- finance/\*
-- admin/\*
-
-instead of managing permissions for thousands of individual files.
-
-Single Lambda vs Multiple Lambdas
+### Single Lambda vs Multiple Lambdas
 
 Start with a single Lambda when:
 
@@ -547,3 +479,14 @@ Split into multiple Lambdas when:
 - Different event sources
 - Different business domains
 - Different scaling requirements
+
+### Future AWS Services
+
+- DynamoDB
+- CloudWatch Metrics
+- CloudWatch Alarms
+- Terraform Modules
+- Remote Terraform State
+- CI/CD Pipelines
+- Dead Letter Queues
+- CSV Aggregation and Reporting
