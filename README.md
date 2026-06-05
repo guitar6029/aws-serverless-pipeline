@@ -299,9 +299,51 @@ Learned:
 
 Implemented an event-driven CSV ingestion workflow using S3, Lambda, Boto3, and Pydantic.
 
-### Architecture
+## DynamoDB
+
+### Payments Table
+
+```hcl
+resource "aws_dynamodb_table" "payments" {
+  name         = "payments"
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key = "payment_id"
+
+  attribute {
+    name = "payment_id"
+    type = "N"
+  }
+}
+```
+
+### IAM Permissions
+
+Lambda execution role granted:
 
 ```text
+dynamodb:PutItem
+```
+
+against:
+
+```text
+payments
+```
+
+### Learned
+
+- DynamoDB is a NoSQL database
+- DynamoDB models access patterns rather than relationships
+- Primary keys determine data access
+- Non-key attributes do not need schema definitions
+- IAM permissions should follow Least Privilege
+- Terraform can manage DynamoDB resources
+- Infrastructure drift can occur when AWS resources are modified manually
+
+### Architecture
+
+```
 client_payments.csv
         ↓
         S3
@@ -317,6 +359,11 @@ CSV Parsing
 Pydantic Validation
         ↓
 CloudWatch Logs
+
+        Future
+           ↓
+
+       DynamoDB
 ```
 
 ### Lambda Structure
@@ -394,17 +441,18 @@ Learned:
 
 ### AWS Resources
 
-- aws_s3_bucket.demo
-- aws_s3_bucket_versioning.demo
-- aws_s3_bucket_server_side_encryption_configuration.demo
-- aws_s3_bucket_lifecycle_configuration.demo
-- aws_s3_object.sample
-- aws_iam_role.lambda_role
-- aws_iam_role_policy_attachment.lambda_basic_execution
-- aws_iam_role_policy.lambda_s3_read
-- aws_lambda_function.demo
-- aws_lambda_permission.allow_s3
-- aws_s3_bucket_notification.demo
+aws_s3_bucket.demo
+aws_s3_bucket_versioning.demo
+aws_s3_bucket_server_side_encryption_configuration.demo
+aws_s3_bucket_lifecycle_configuration.demo
+aws_iam_role.lambda_role
+aws_iam_role_policy_attachment.lambda_basic_execution
+aws_iam_role_policy.lambda_s3_read
+aws_iam_role_policy.lambda_dynamodb_write
+aws_lambda_function.demo
+aws_lambda_permission.allow_s3
+aws_s3_bucket_notification.demo
+aws_dynamodb_table.payments
 
 ### Current Architecture
 
@@ -450,6 +498,23 @@ CloudWatch Logs
 - Dependency Management
 - Pydantic Validation
 - CSV Processing Pipelines
+- DynamoDB Fundamentals
+- NoSQL vs Relational Databases
+- Access Pattern Design
+- Partition Keys
+- Inline IAM Policies
+- Infrastructure Drift
+- Infrastructure as Code Workflows
+
+### Infrastructure Drift
+
+Learned:
+
+- Terraform is the source of truth
+- Manual AWS Console changes can cause drift
+- `terraform plan` detects drift
+- `terraform apply` restores desired state
+- Infrastructure changes should be reviewed through code
 
 ---
 
@@ -480,9 +545,12 @@ Split into multiple Lambdas when:
 - Different business domains
 - Different scaling requirements
 
-### Future AWS Services
+### Next Milestones
 
-- DynamoDB
+- Persist validated payments into DynamoDB
+- Query payments from DynamoDB
+- API Lambda
+- API Gateway
 - CloudWatch Metrics
 - CloudWatch Alarms
 - Terraform Modules
