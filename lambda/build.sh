@@ -19,10 +19,13 @@ uv pip install -r requirements.txt --target build
 
 echo "Copying source files..."
 
-cp handler.py build/
+cp ingestion_handler.py build/
 cp -r models build/
 cp -r processors build/
 cp -r repositories build/
+
+#payments-api
+cp -r payments_api_handler.py build/
 
 echo "Creating deployment package..."
 

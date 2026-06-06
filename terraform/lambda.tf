@@ -5,7 +5,7 @@ resource "aws_lambda_function" "demo" {
 
   runtime = "python3.12"
 
-  handler = "handler.handler"
+  handler = "ingestion_handler.handler"
 
   filename = "../lambda/handler.zip"
 
