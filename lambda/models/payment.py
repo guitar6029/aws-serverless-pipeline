@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from enum import Enum
 from datetime import date
+from decimal import Decimal
 
 
 class PaymentStatus(str, Enum):
@@ -12,6 +13,6 @@ class PaymentStatus(str, Enum):
 class Payment(BaseModel):
     payment_id: int
     client: str
-    amount: float
+    amount: Decimal
     date: date
     status: PaymentStatus
