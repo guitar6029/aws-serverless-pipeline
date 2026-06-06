@@ -16,3 +16,11 @@ resource "aws_api_gateway_resource" "payments" {
   parent_id   = aws_api_gateway_rest_api.payments.root_resource_id
   path_part   = "payments"
 }
+
+
+#for individual payment
+resource "aws_api_gateway_resource" "payment_id" {
+  rest_api_id = aws_api_gateway_rest_api.payments.id
+  parent_id   = aws_api_gateway_resource.payments.id
+  path_part   = "{payment_id}"
+}
