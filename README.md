@@ -301,6 +301,70 @@ Implemented an event-driven CSV ingestion workflow using S3, Lambda, Boto3, and 
 
 ## DynamoDB
 
+## DynamoDB Persistence
+
+Implemented persistent storage of payment records using DynamoDB.
+
+```
+Architecture:
+
+CSV
+ ↓
+S3
+ ↓
+Lambda
+ ↓
+Pydantic Validation
+ ↓
+DynamoDB
+DynamoDB Table
+
+```
+
+resource "aws_dynamodb_table" "payments" {
+name = "payments"
+billing_mode = "PAY_PER_REQUEST"
+hash_key = "payment_id"
+
+attribute {
+name = "payment_id"
+type = "N"
+}
+}
+
+DynamoDB IAM Permissions
+
+Lambda execution role granted:
+
+dynamodb:PutItem
+Repository Layer
+lambda/
+├── repositories/
+│ └── payments.py
+
+Purpose:
+
+Separate persistence from business logic
+Keep handler focused on orchestration
+Allow storage implementation changes later
+Decimal vs Float
+
+Issue encountered:
+
+Float types are not supported.
+Use Decimal types instead.
+
+Resolution:
+
+from decimal import Decimal
+amount: Decimal
+
+Learned:
+
+-DynamoDB uses Decimal for numeric precision
+-Float is unsuitable for financial data
+-Monetary values require deterministic precision
+
 ### Payments Table
 
 ```hcl
@@ -352,18 +416,14 @@ Event Notification
         ↓
      Lambda
         ↓
-S3 GetObject
-        ↓
 CSV Parsing
         ↓
 Pydantic Validation
         ↓
-CloudWatch Logs
+DynamoDB Persistence
+        ↓
+   DynamoDB Table
 
-        Future
-           ↓
-
-       DynamoDB
 ```
 
 ### Lambda Structure
