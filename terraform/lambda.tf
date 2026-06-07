@@ -24,3 +24,19 @@ resource "aws_lambda_permission" "allow_s3" {
 
 }
 
+resource "aws_lambda_function" "payments_api" {
+  function_name = "payments-api"
+
+  role = aws_iam_role.lambda_role.arn
+
+  runtime = "python3.12"
+
+  handler = "payments_api_handler.handler"
+
+  filename = "../lambda/handler.zip"
+
+  source_code_hash = filebase64sha256("../lambda/handler.zip")
+
+  timeout     = 5
+  memory_size = 128
+}
