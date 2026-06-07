@@ -40,3 +40,16 @@ resource "aws_lambda_function" "payments_api" {
   timeout     = 5
   memory_size = 128
 }
+
+
+resource "aws_lambda_permission" "allow_payments_api" {
+  statement_id = "AllowExecutionFromAPIGateway"
+
+  action = "lambda:InvokeFunction"
+
+  function_name = aws_lambda_function.payments_api.function_name
+
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
+}
