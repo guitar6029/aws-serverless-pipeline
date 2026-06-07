@@ -45,3 +45,15 @@ resource "aws_api_gateway_integration" "payments_api" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
 }
+
+resource "aws_api_gateway_deployment" "payments" {
+  rest_api_id = aws_api_gateway_rest_api.payments.id
+}
+
+resource "aws_api_gateway_stage" "payments" {
+  deployment_id = aws_api_gateway_deployment.payments.id
+
+  rest_api_id = aws_api_gateway_rest_api.payments.id
+
+  stage_name = "dev"
+}
