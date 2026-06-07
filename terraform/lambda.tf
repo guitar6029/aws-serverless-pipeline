@@ -27,7 +27,7 @@ resource "aws_lambda_permission" "allow_s3" {
 resource "aws_lambda_function" "payments_api" {
   function_name = "payments-api"
 
-  role = aws_iam_role.lambda_role.arn
+  role = aws_iam_role.payments_api_role.arn
 
   runtime = "python3.12"
 
