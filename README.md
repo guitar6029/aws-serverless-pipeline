@@ -29,7 +29,7 @@ Learned:
 
 Created first managed resource:
 
-```hcl
+```
 resource "local_file" "hello" {
   filename = "hello.txt"
   content  = "This is an example message text"
@@ -54,13 +54,13 @@ Completed initial AWS account setup:
 
 Verified authentication:
 
-```bash
+```
 aws sts get-caller-identity
 ```
 
 ### AWS Provider
 
-```hcl
+```
 terraform {
   required_providers {
     aws = {
@@ -87,7 +87,7 @@ Learned:
 
 ### Bucket
 
-```hcl
+```
 resource "aws_s3_bucket" "demo" {
   bucket = "jsdev305-aws-serverless-pipeline-demo"
 }
@@ -95,7 +95,7 @@ resource "aws_s3_bucket" "demo" {
 
 ### Tags
 
-```hcl
+```
 tags = {
   Environment = "dev"
   ManagedBy   = "terraform"
@@ -105,7 +105,7 @@ tags = {
 
 ### Versioning
 
-```hcl
+```
 resource "aws_s3_bucket_versioning" "demo" {
   bucket = aws_s3_bucket.demo.id
 
@@ -117,7 +117,7 @@ resource "aws_s3_bucket_versioning" "demo" {
 
 ### Encryption
 
-```hcl
+```
 resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
   bucket = aws_s3_bucket.demo.id
 
@@ -131,7 +131,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "demo" {
 
 ### Lifecycle Rules
 
-```hcl
+```
 resource "aws_s3_bucket_lifecycle_configuration" "demo" {
   bucket = aws_s3_bucket.demo.id
 
@@ -159,7 +159,7 @@ Learned:
 
 ### Lambda Execution Role
 
-```hcl
+```
 resource "aws_iam_role" "lambda_role" {
   name = "aws-serverless-pipeline-lambda-role"
 }
@@ -174,7 +174,7 @@ Learned:
 
 ### CloudWatch Permissions
 
-```hcl
+```
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   role       = aws_iam_role.lambda_role.name
 
@@ -186,7 +186,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 
 Lambda execution role granted:
 
-```text
+```
 s3:GetObject
 ```
 
@@ -202,7 +202,7 @@ Learned:
 
 ### Initial Function
 
-```python
+```
 def handler(event, context):
     print("Hello from Lambda")
 
@@ -232,7 +232,7 @@ Learned:
 
 ### Lambda Invocation Permissions
 
-```hcl
+```
 resource "aws_lambda_permission" "allow_s3" {
   action        = "lambda:InvokeFunction"
   principal     = "s3.amazonaws.com"
@@ -242,7 +242,7 @@ resource "aws_lambda_permission" "allow_s3" {
 
 ### S3 Event Notifications
 
-```hcl
+```
 resource "aws_s3_bucket_notification" "demo" {
   bucket = aws_s3_bucket.demo.id
 
@@ -274,13 +274,13 @@ Learned:
 
 Implicit dependency:
 
-```hcl
+```
 role = aws_iam_role.lambda_role.arn
 ```
 
 Explicit dependency:
 
-```hcl
+```
 depends_on = [
   aws_lambda_permission.allow_s3
 ]
@@ -367,7 +367,7 @@ Learned:
 
 ### Payments Table
 
-```hcl
+```
 resource "aws_dynamodb_table" "payments" {
   name         = "payments"
   billing_mode = "PAY_PER_REQUEST"
@@ -385,13 +385,13 @@ resource "aws_dynamodb_table" "payments" {
 
 Lambda execution role granted:
 
-```text
+```
 dynamodb:PutItem
 ```
 
 against:
 
-```text
+```
 payments
 ```
 
@@ -428,7 +428,7 @@ DynamoDB Persistence
 
 ### Lambda Structure
 
-```text
+```
 lambda/
 ├── handler.py
 ├── models/
@@ -443,7 +443,7 @@ lambda/
 
 #### Payment Model
 
-```python
+```
 class Payment(BaseModel):
     payment_id: int
     client: str
@@ -454,7 +454,7 @@ class Payment(BaseModel):
 
 #### Payment Status
 
-```python
+```
 class PaymentStatus(str, Enum):
     PAID = "paid"
     PENDING = "pending"
@@ -474,7 +474,7 @@ class PaymentStatus(str, Enum):
 
 Issue:
 
-```text
+```
 No module named 'pydantic_core._pydantic_core'
 ```
 
@@ -497,6 +497,170 @@ Learned:
 
 ---
 
+---
+
+# Payments API
+
+Implemented a serverless REST API for retrieving payment records from DynamoDB.
+
+## Architecture
+
+```
+Client
+   ↓
+API Gateway
+   ↓
+GET /payments/{payment_id}
+   ↓
+Lambda (payments-api)
+   ↓
+DynamoDB GetItem
+   ↓
+JSON Response
+```
+
+## API Gateway
+
+### Resources
+
+```
+/payments
+/payments/{payment_id}
+```
+
+### Method
+
+```
+GET
+```
+
+### Integration
+
+```
+AWS_PROXY
+```
+
+Learned:
+
+- API Gateway resources define URL paths
+- Methods define supported HTTP verbs
+- Integrations define backend targets
+- Proxy integrations forward requests directly to Lambda
+- API Gateway deployments create immutable snapshots
+- Stages expose deployments through public URLs
+
+## Lambda Proxy Integration
+
+```
+Client Request
+        ↓
+API Gateway
+        ↓
+Lambda Event
+        ↓
+Lambda Response
+        ↓
+API Gateway Response
+```
+
+Learned:
+
+- API Gateway invokes Lambda using an internal AWS integration request
+- Client HTTP methods are independent from integration HTTP methods
+- Lambda proxy integrations pass request context automatically
+- Path parameters are available through `event["pathParameters"]`
+
+## Dedicated IAM Role
+
+Created a dedicated execution role for the Payments API Lambda.
+
+Role:
+
+```
+payments-api-role
+```
+
+Permissions:
+
+```
+dynamodb:GetItem
+AWSLambdaBasicExecutionRole
+```
+
+Learned:
+
+- Roles should represent workloads
+- Least Privilege limits blast radius
+- Different Lambdas often require different permissions
+- Read and write access should be separated when practical
+
+## Example Request
+
+```
+curl https://<api-id>.execute-api.us-east-1.amazonaws.com/dev/payments/1001
+```
+
+## Example Response
+
+```
+{
+  "amount": "1250.50",
+  "date": "2026-04-15",
+  "payment_id": 1001,
+  "client": "acme corp",
+  "status": "paid"
+}
+```
+
+## Debugging Lessons
+
+### Missing Lambda Handler
+
+Issue:
+
+```
+Unable to import module 'handler'
+```
+
+Root Cause:
+
+Terraform Lambda handler configuration referenced the wrong file.
+
+Resolution:
+
+```
+handler.handler
+        ↓
+ingestion_handler.handler
+```
+
+### IAM Access Denied
+
+Issue:
+
+```
+AccessDeniedException
+dynamodb:GetItem
+```
+
+Root Cause:
+
+Payments API Lambda lacked DynamoDB read permissions.
+
+Resolution:
+
+Created a dedicated IAM role with:
+
+```
+dynamodb:GetItem
+```
+
+Learned:
+
+- Invocation permissions and execution permissions are separate concerns
+- CloudWatch logs are the primary debugging tool for Lambda workloads
+- AWS error messages are often highly specific and actionable
+
 ## Current Infrastructure
 
 ### AWS Resources
@@ -505,33 +669,50 @@ aws_s3_bucket.demo
 aws_s3_bucket_versioning.demo
 aws_s3_bucket_server_side_encryption_configuration.demo
 aws_s3_bucket_lifecycle_configuration.demo
+
 aws_iam_role.lambda_role
-aws_iam_role_policy_attachment.lambda_basic_execution
+aws_iam_role.payments_api_role
+
 aws_iam_role_policy.lambda_s3_read
 aws_iam_role_policy.lambda_dynamodb_write
+aws_iam_role_policy.payments_api_dynamodb_read
+
 aws_lambda_function.demo
+aws_lambda_function.payments_api
+
 aws_lambda_permission.allow_s3
+aws_lambda_permission.allow_payments_api
+
 aws_s3_bucket_notification.demo
+
 aws_dynamodb_table.payments
+
+aws_api_gateway_rest_api.payments
+aws_api_gateway_resource.payments
+aws_api_gateway_resource.payment_id
+aws_api_gateway_method.get_payment
+aws_api_gateway_integration.payments_api
+aws_api_gateway_deployment.payments
+aws_api_gateway_stage.payments
 
 ### Current Architecture
 
-```text
+```
 client_payments.csv
         ↓
         S3
         ↓
 Event Notification
         ↓
-     Lambda
+Ingestion Lambda
         ↓
-S3 GetObject
+DynamoDB
         ↓
-CSV Parsing
+API Lambda
         ↓
-Pydantic Validation
+API Gateway
         ↓
-CloudWatch Logs
+Client
 ```
 
 ---
@@ -607,10 +788,8 @@ Split into multiple Lambdas when:
 
 ### Next Milestones
 
-- Persist validated payments into DynamoDB
-- Query payments from DynamoDB
-- API Lambda
-- API Gateway
+- List Payments Endpoint
+- Query Patterns and Secondary Indexes
 - CloudWatch Metrics
 - CloudWatch Alarms
 - Terraform Modules
@@ -618,3 +797,7 @@ Split into multiple Lambdas when:
 - CI/CD Pipelines
 - Dead Letter Queues
 - CSV Aggregation and Reporting
+- Authentication and Authorization
+- API Versioning
+- CloudWatch Metrics
+- CloudWatch Alarms
