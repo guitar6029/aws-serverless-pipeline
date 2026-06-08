@@ -507,16 +507,31 @@ Implemented a serverless REST API for retrieving payment records from DynamoDB.
 
 ```
 Client
-   ↓
+  |
+  v
 API Gateway
-   ↓
-GET /payments/{payment_id}
-   ↓
-Lambda (payments-api)
-   ↓
-DynamoDB GetItem
-   ↓
-JSON Response
+  |
+  +--> GET /payments/{payment_id}
+  |        |
+  |        v
+  |    Lambda (payments-api)
+  |        |
+  |        v
+  |   DynamoDB GetItem
+  |        |
+  |        v
+  |   JSON Response
+  |
+  +--> GET /payments
+           |
+           v
+      Lambda (payments-api)
+           |
+           v
+      DynamoDB Scan
+           |
+           v
+      JSON Response
 ```
 
 ## API Gateway
@@ -584,6 +599,7 @@ Permissions:
 
 ```
 dynamodb:GetItem
+dynamodb:Scan
 AWSLambdaBasicExecutionRole
 ```
 
@@ -598,6 +614,7 @@ Learned:
 
 ```
 curl https://<api-id>.execute-api.us-east-1.amazonaws.com/dev/payments/1001
+curl https://<api-id>.execute-api.us-east-1.amazonaws.com/dev/payments
 ```
 
 ## Example Response
@@ -661,6 +678,32 @@ Learned:
 - CloudWatch logs are the primary debugging tool for Lambda workloads
 - AWS error messages are often highly specific and actionable
 
+### API Gateway Deployment and IAM Debugging
+
+Issue:
+
+```
+GET /payments returned 502 Internal Server Error
+```
+
+Root Cause:
+
+API Gateway deployment snapshot was out of date
+Payments API role lacked dynamodb:Scan
+
+Resolution:
+
+Rebuilt and redeployed Lambda package
+Updated IAM policy to include dynamodb:Scan
+Recreated API Gateway deployment
+
+Learned:
+
+-CloudWatch logs should be the first place to investigate failures
+-API Gateway deployments are snapshots of API configuration
+-GetItem and Scan require separate IAM permissions
+-Terraform state, deployed infrastructure, and deployed Lambda code can become out of sync
+
 ## Current Infrastructure
 
 ### AWS Resources
@@ -691,7 +734,9 @@ aws_api_gateway_rest_api.payments
 aws_api_gateway_resource.payments
 aws_api_gateway_resource.payment_id
 aws_api_gateway_method.get_payment
-aws_api_gateway_integration.payments_api
+aws_api_gateway_method.get_payments
+aws_api_gateway_integration.get_payment
+aws_api_gateway_integration.get_payments
 aws_api_gateway_deployment.payments
 aws_api_gateway_stage.payments
 
@@ -746,6 +791,15 @@ Client
 - Inline IAM Policies
 - Infrastructure Drift
 - Infrastructure as Code Workflows
+- API Gateway Resources
+- API Gateway Methods
+- API Gateway Integrations
+- API Gateway Deployments
+- API Gateway Stages
+- Lambda Proxy Integration
+- DynamoDB Scan vs GetItem
+- CloudWatch-Based Debugging
+- Least Privilege IAM Design
 
 ### Infrastructure Drift
 
@@ -788,7 +842,11 @@ Split into multiple Lambdas when:
 
 ### Next Milestones
 
-- List Payments Endpoint
+- Pagination
+- Query Parameters
+- Payment Filtering
+- DynamoDB Query Patterns
+- Secondary Indexes (GSI)
 - Query Patterns and Secondary Indexes
 - CloudWatch Metrics
 - CloudWatch Alarms
