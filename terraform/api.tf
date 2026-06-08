@@ -17,7 +17,6 @@ resource "aws_api_gateway_resource" "payments" {
   path_part   = "payments"
 }
 
-
 #for individual payment
 resource "aws_api_gateway_resource" "payment_id" {
   rest_api_id = aws_api_gateway_rest_api.payments.id
@@ -25,6 +24,12 @@ resource "aws_api_gateway_resource" "payment_id" {
   path_part   = "{payment_id}"
 }
 
+resource "aws_api_gateway_method" "get_payments" {
+  rest_api_id   = aws_api_gateway_rest_api.payments.id
+  resource_id   = aws_api_gateway_resource.payments.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
 
 resource "aws_api_gateway_method" "get_payment" {
   rest_api_id = aws_api_gateway_rest_api.payments.id
@@ -36,8 +41,19 @@ resource "aws_api_gateway_method" "get_payment" {
   authorization = "NONE"
 }
 
+resource "aws_api_gateway_integration" "get_payments" {
+  rest_api_id = aws_api_gateway_rest_api.payments.id
+  resource_id = aws_api_gateway_resource.payments.id
+  http_method = aws_api_gateway_method.get_payments.http_method
 
-resource "aws_api_gateway_integration" "payments_api" {
+  uri = aws_lambda_function.payments_api.invoke_arn
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+}
+
+
+resource "aws_api_gateway_integration" "get_payment" {
   rest_api_id             = aws_api_gateway_rest_api.payments.id
   resource_id             = aws_api_gateway_resource.payment_id.id
   http_method             = aws_api_gateway_method.get_payment.http_method
@@ -48,6 +64,9 @@ resource "aws_api_gateway_integration" "payments_api" {
 
 resource "aws_api_gateway_deployment" "payments" {
   rest_api_id = aws_api_gateway_rest_api.payments.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_stage" "payments" {

@@ -9,18 +9,23 @@ def save_payment(payment):
 
 
 def get_payment(payment_id: int):
-    response = table.get_item(
-        Key={
-            "payment_id": payment_id
-        }
-    )
-    
+    response = table.get_item(Key={"payment_id": payment_id})
+
     item = response.get("Item")
-    
+
     if item is None:
         return None
-    
+
     item["payment_id"] = int(item["payment_id"])
-    
-    
+
     return item
+
+
+def list_payments():
+    response = table.scan()
+    items = response.get("Items", [])
+
+    for item in items:
+        item["payment_id"] = int(item["payment_id"])
+
+    return items

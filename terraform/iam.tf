@@ -109,7 +109,8 @@ resource "aws_iam_role_policy" "payments_api_dynamodb_read" {
     Statement = [{
       Effect = "Allow"
       Action = [
-        "dynamodb:GetItem"
+        "dynamodb:GetItem",
+        "dynamodb:Scan"
       ]
       Resource = aws_dynamodb_table.payments.arn
     }]
