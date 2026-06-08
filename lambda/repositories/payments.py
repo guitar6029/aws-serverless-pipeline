@@ -1,4 +1,5 @@
 import boto3
+from boto3.dynamodb.conditions import Attr
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("payments")
@@ -21,8 +22,13 @@ def get_payment(payment_id: int):
     return item
 
 
-def list_payments():
-    response = table.scan()
+def list_payments(status=None):
+
+    if status is not None:
+        response = table.scan(FilterExpression=Attr("status").eq(status))
+    else:
+        response = table.scan()
+
     items = response.get("Items", [])
 
     for item in items:
