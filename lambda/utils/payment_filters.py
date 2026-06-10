@@ -12,10 +12,10 @@ def parse_payment_filters(query_params: dict[str, str]) -> PaymentFilters:
     if status_param:
         filters.status = PaymentStatus(status_param)
 
-    company_param = query_params.get("company")
+    client_param = query_params.get("client")
 
-    if company_param:
-        filters.company = company_param
+    if client_param:
+        filters.client = client_param
 
     min_amount_param = query_params.get("min_amount")
 

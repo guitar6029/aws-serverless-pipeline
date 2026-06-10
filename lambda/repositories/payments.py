@@ -37,8 +37,8 @@ def build_filter_expression(filters: PaymentFilters):
 
     if filters.status:
         conditions.append(Attr("status").eq(filters.status.value))
-    if filters.company:
-        conditions.append(Attr("company").eq(filters.company))
+    if filters.client:
+        conditions.append(Attr("client").eq(filters.client))
 
     if filters.min_amount:
         conditions.append(Attr("amount").gte(filters.min_amount))

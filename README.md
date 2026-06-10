@@ -551,7 +551,7 @@ JSON Response
 @dataclass
 class PaymentFilters:
     status: PaymentStatus | None = None
-    company: str | None = None
+    client: str | None = None
     min_amount: Decimal | None = None
     max_amount: Decimal | None = None
 ```
@@ -948,7 +948,6 @@ Split into multiple Lambdas when:
 
 ### Next Milestones
 
-- Company Filtering
 - Pagination
 - DynamoDB Query Patterns
 - Query vs Scan Performance
