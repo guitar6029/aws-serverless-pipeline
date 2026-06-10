@@ -435,7 +435,11 @@ lambda/
 │   └── payment.py
 ├── processors/
 │   └── payments.py
-├── pyproject.toml
+├── pyproject.
+utils/
+├── payment_filters.py
+├── payment_response.py
+toml
 └── uv.lock
 ```
 
@@ -447,7 +451,7 @@ lambda/
 class Payment(BaseModel):
     payment_id: int
     client: str
-    amount: float
+    amount: Decimal
     date: date
     status: PaymentStatus
 ```
@@ -503,36 +507,138 @@ Learned:
 
 Implemented a serverless REST API for retrieving payment records from DynamoDB.
 
-## Architecture
+## Payment Filtering
+
+Implemented query parameter filtering for payment retrieval endpoints.
+
+### Supported Filters
 
 ```
-Client
-  |
-  v
-API Gateway
-  |
-  +--> GET /payments/{payment_id}
-  |        |
-  |        v
-  |    Lambda (payments-api)
-  |        |
-  |        v
-  |   DynamoDB GetItem
-  |        |
-  |        v
-  |   JSON Response
-  |
-  +--> GET /payments
-           |
-           v
-      Lambda (payments-api)
-           |
-           v
-      DynamoDB Scan
-           |
-           v
-      JSON Response
+GET /payments?status=paid
+
+GET /payments?min_amount=500
+
+GET /payments?max_amount=1000
+
+GET /payments?status=paid&min_amount=500
 ```
+
+### Architecture
+
+```
+Client Request
+        ↓
+API Gateway
+        ↓
+Payments API Lambda
+        ↓
+Query Parameter Parsing
+        ↓
+PaymentFilters
+        ↓
+DynamoDB Filter Expression
+        ↓
+DynamoDB Scan
+        ↓
+Response Mapping
+        ↓
+JSON Response
+```
+
+### Payment Filters Model
+
+```
+@dataclass
+class PaymentFilters:
+    status: PaymentStatus | None = None
+    company: str | None = None
+    min_amount: Decimal | None = None
+    max_amount: Decimal | None = None
+```
+
+### Filter Expression Builder
+
+Implemented dynamic DynamoDB filter generation using Boto3 condition expressions.
+
+Example:
+
+```
+Attr("status").eq("paid")
+
+Attr("amount").gte(Decimal("500"))
+
+Attr("amount").lte(Decimal("1000"))
+```
+
+Multiple filters are combined using logical AND operations.
+
+### Response Mapping
+
+Introduced a dedicated response-mapping layer to separate:
+
+- Domain models
+- DynamoDB persistence models
+- API response models
+
+Example:
+
+```
+DynamoDB Item
+      ↓
+payment_to_response()
+      ↓
+JSON Response
+```
+
+### Serialization Lessons
+
+Issue encountered:
+
+```
+Object of type Decimal is not JSON serializable
+```
+
+Root Cause:
+
+DynamoDB stores numeric values as Decimal objects.
+
+Resolution:
+
+Added response mapping that converts DynamoDB-specific types into API-friendly response objects before JSON serialization.
+
+### DynamoDB Data Modeling Lesson
+
+Issue encountered:
+
+Amount values were stored as String attributes in DynamoDB.
+
+Root Cause:
+
+```
+payment.model_dump(mode="json")
+```
+
+converted Decimal values into strings before persistence.
+
+Resolution:
+
+Implemented explicit persistence mapping to preserve:
+
+```
+payment_id -> Number
+amount     -> Number
+date       -> String
+status     -> String
+client     -> String
+```
+
+Learned:
+
+- API serialization and database serialization are different concerns
+- DynamoDB numeric values should be stored as Number attributes
+- JSON representations are not always appropriate for persistence
+- Different application layers often require different data representations
+- Response mapping improves maintainability and separation of concerns
 
 ## API Gateway
 
@@ -842,12 +948,11 @@ Split into multiple Lambdas when:
 
 ### Next Milestones
 
+- Company Filtering
 - Pagination
-- Query Parameters
-- Payment Filtering
 - DynamoDB Query Patterns
+- Query vs Scan Performance
 - Secondary Indexes (GSI)
-- Query Patterns and Secondary Indexes
 - CloudWatch Metrics
 - CloudWatch Alarms
 - Terraform Modules
@@ -857,5 +962,3 @@ Split into multiple Lambdas when:
 - CSV Aggregation and Reporting
 - Authentication and Authorization
 - API Versioning
-- CloudWatch Metrics
-- CloudWatch Alarms
