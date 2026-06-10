@@ -23,6 +23,7 @@ cp ingestion_handler.py build/
 cp -r models build/
 cp -r processors build/
 cp -r repositories build/
+cp -r utils build/
 
 #payments-api
 cp -r payments_api_handler.py build/

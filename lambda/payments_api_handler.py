@@ -1,7 +1,7 @@
 import json
-
 from repositories.payments import get_payment, list_payments
-from models.payment import PaymentStatus
+from utils.payment_filters import parse_payment_filters
+from utils.payment_response import payment_to_response
 
 
 def handler(event, context):
@@ -20,24 +20,21 @@ def handler(event, context):
                 "body": json.dumps({"message": "Payment not found"}),
             }
 
-        return {"statusCode": 200, "body": json.dumps(payment)}
+        response = payment_to_response(payment)
+
+        return {"statusCode": 200, "body": json.dumps(response)}
     else:
-        query_params = event.get("queryStringParameters")
 
-        status: PaymentStatus | None = None
+        try:
+            filters = parse_payment_filters(event.get("queryStringParameters") or {})
+        except ValueError:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({"message": "Invalid filters"}),
+            }
 
-        if query_params:
-            status_param = query_params.get("status")
+        payments = list_payments(filters)
 
-            if status_param is not None:
-                try:
-                    status = PaymentStatus(status_param)
-                except ValueError:
-                    return {
-                        "statusCode": 400,
-                        "body": json.dumps({"message": "Invalid status"}),
-                    }
+        response = [payment_to_response(payment) for payment in payments]
 
-        payments = list_payments(status)
-
-        return {"statusCode": 200, "body": json.dumps(payments)}
+        return {"statusCode": 200, "body": json.dumps(response)}
