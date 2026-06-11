@@ -948,10 +948,6 @@ Split into multiple Lambdas when:
 
 ### Next Milestones
 
-- Pagination
-- DynamoDB Query Patterns
-- Query vs Scan Performance
-- Secondary Indexes (GSI)
 - CloudWatch Metrics
 - CloudWatch Alarms
 - Terraform Modules

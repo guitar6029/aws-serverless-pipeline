@@ -1,5 +1,5 @@
 import boto3
-from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Attr, Key
 from models.payment_filter import PaymentFilters
 
 dynamodb = boto3.resource("dynamodb")
@@ -37,8 +37,6 @@ def build_filter_expression(filters: PaymentFilters):
 
     if filters.status:
         conditions.append(Attr("status").eq(filters.status.value))
-    if filters.client:
-        conditions.append(Attr("client").eq(filters.client))
 
     if filters.min_amount:
         conditions.append(Attr("amount").gte(filters.min_amount))
@@ -73,7 +71,15 @@ def list_payments(filters: PaymentFilters):
     if filters.last_key:
         scan_kwargs["ExclusiveStartKey"] = {"payment_id": filters.last_key}
 
-    response = table.scan(**scan_kwargs)
+    # # if client present , query instead
+    if filters.client:
+        response = table.query(
+            IndexName="client-index",
+            KeyConditionExpression=Key("client").eq(filters.client),
+        )
+
+    else:  # scan if no filter tied to gsi
+        response = table.scan(**scan_kwargs)
 
     # grab last key
     last_key = response.get("LastEvaluatedKey")
