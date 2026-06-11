@@ -9,3 +9,6 @@ class PaymentFilters:
     client: str | None = None
     min_amount: Decimal | None = None
     max_amount: Decimal | None = None
+
+    limit: int | None = None
+    last_key: int | None = None

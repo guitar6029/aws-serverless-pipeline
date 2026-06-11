@@ -33,8 +33,15 @@ def handler(event, context):
                 "body": json.dumps({"message": "Invalid filters"}),
             }
 
-        payments = list_payments(filters)
+        # items and last_key
+        result = list_payments(filters)
 
-        response = [payment_to_response(payment) for payment in payments]
+        items = result["items"]
+        last_key = result["last_key"]
+
+        response = {
+            "items": [payment_to_response(payment) for payment in items],
+            "last_key": last_key,
+        }
 
         return {"statusCode": 200, "body": json.dumps(response)}

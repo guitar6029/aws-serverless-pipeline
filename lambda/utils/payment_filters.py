@@ -7,6 +7,16 @@ def parse_payment_filters(query_params: dict[str, str]) -> PaymentFilters:
 
     filters = PaymentFilters()
 
+    limit_param = query_params.get("limit")
+
+    if limit_param:
+        filters.limit = int(limit_param)
+
+    last_key_param = query_params.get("last_key")
+
+    if last_key_param:
+        filters.last_key = int(last_key_param)
+
     status_param = query_params.get("status")
 
     if status_param:

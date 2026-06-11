@@ -62,17 +62,32 @@ def list_payments(filters: PaymentFilters):
     # first build the query expression
     filter_expressions = build_filter_expression(filters)
 
-    if filter_expressions is None:
-        response = table.scan()
-    else:
-        # feed the expression into the table if has at least one query
-        response = table.scan(FilterExpression=filter_expressions)
+    scan_kwargs = {}
 
-    # extract items
+    if filters.limit:
+        scan_kwargs["Limit"] = filters.limit
+
+    if filter_expressions:
+        scan_kwargs["FilterExpression"] = filter_expressions
+
+    if filters.last_key:
+        scan_kwargs["ExclusiveStartKey"] = {"payment_id": filters.last_key}
+
+    response = table.scan(**scan_kwargs)
+
+    # grab last key
+    last_key = response.get("LastEvaluatedKey")
+
+    cursor = None
+
+    if last_key:
+        cursor = int(last_key["payment_id"])
+
     items = response.get("Items", [])
 
     for item in items:
         # format the payment_id
         item["payment_id"] = int(item["payment_id"])
 
-    return items
+    # return items and last key
+    return {"items": items, "last_key": cursor}
