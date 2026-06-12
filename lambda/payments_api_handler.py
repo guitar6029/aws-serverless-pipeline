@@ -3,6 +3,9 @@ from repositories.payments import get_payment, list_payments
 from utils.payment_filters import parse_payment_filters
 from utils.payment_response import payment_to_response
 
+# def handler(event, context):
+#     raise Exception("Tesing alarm!")
+
 
 def handler(event, context):
 
