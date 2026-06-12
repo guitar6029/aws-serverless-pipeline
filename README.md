@@ -810,6 +810,23 @@ Learned:
 -GetItem and Scan require separate IAM permissions
 -Terraform state, deployed infrastructure, and deployed Lambda code can become out of sync
 
+## CloudWatch Monitoring
+
+### Implemented
+
+- Lambda Error Alarm
+- CloudWatch Metrics
+- CloudWatch Logs
+- Alarm Testing and Recovery
+
+### Concepts Learned
+
+- Metrics vs Logs
+- CloudWatch Alarms
+- Thresholds
+- Evaluation Periods
+- Monitoring Production Failures
+
 ## Current Infrastructure
 
 ### AWS Resources
@@ -906,6 +923,11 @@ Client
 - DynamoDB Scan vs GetItem
 - CloudWatch-Based Debugging
 - Least Privilege IAM Design
+- Metrics vs Logs
+- CloudWatch Alarms
+- Thresholds
+- Evaluation Periods
+- Monitoring Production Failures
 
 ### Infrastructure Drift
 
@@ -948,8 +970,6 @@ Split into multiple Lambdas when:
 
 ### Next Milestones
 
-- CloudWatch Metrics
-- CloudWatch Alarms
 - Terraform Modules
 - Remote Terraform State
 - CI/CD Pipelines
