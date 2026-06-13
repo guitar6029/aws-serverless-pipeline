@@ -24,6 +24,13 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+
+        with:
+          role-to-assume: arn:aws:iam::941141115076:role/github-actions-terraform
+          aws-region: us-east-1
+
       - name: Terraform Init
         run: terraform init
 
