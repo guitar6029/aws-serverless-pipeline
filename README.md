@@ -851,6 +851,33 @@ Learned:
 - Migrate existing resources using `terraform state mv`
 - Expose and consume module outputs
 
+## Terraform Remote State
+
+### Concepts
+
+- Local state
+- Remote state
+- S3 backend
+- State locking
+- DynamoDB locks
+- Backend migration
+
+### Lessons Learned
+
+- Local state works for a single developer
+- Remote state is shared across a team
+- Terraform uses S3 as the source of truth
+- DynamoDB prevents concurrent infrastructure changes
+- terraform init can migrate local state to a remote backend
+- terraform state mv can safely refactor resources without recreation
+
+### Exercises
+
+- Create S3 backend bucket
+- Create DynamoDB lock table
+- Migrate local state to S3
+- Verify state locking
+
 ## Current Infrastructure
 
 ### AWS Resources
@@ -994,7 +1021,6 @@ Split into multiple Lambdas when:
 
 ### Next Milestones
 
-- Remote Terraform State
 - CI/CD Pipelines
 - Dead Letter Queues
 - CSV Aggregation and Reporting
