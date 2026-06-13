@@ -15,6 +15,6 @@ resource "aws_cloudwatch_metric_alarm" "payments_api_errors" {
   statistic = "Sum"
 
   dimensions = {
-    FunctionName = aws_lambda_function.payments_api.function_name
+    FunctionName = module.payments_api.function_name
   }
 }

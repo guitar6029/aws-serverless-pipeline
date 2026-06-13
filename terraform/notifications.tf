@@ -1,7 +1,7 @@
 resource "aws_s3_bucket_notification" "demo" {
   bucket = aws_s3_bucket.demo.id
   lambda_function {
-    lambda_function_arn = aws_lambda_function.demo.arn
+    lambda_function_arn = module.demo_lambda.function_arn
     events              = ["s3:ObjectCreated:*"]
   }
 
