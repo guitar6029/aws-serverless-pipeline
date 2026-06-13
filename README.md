@@ -827,6 +827,30 @@ Learned:
 - Evaluation Periods
 - Monitoring Production Failures
 
+## Terraform Modules
+
+### Concepts
+
+- Reusable infrastructure components
+- Inputs (variables)
+- Outputs
+- Module encapsulation
+- State migration with `terraform state mv`
+
+### Lessons Learned
+
+- Modules reduce duplication and improve maintainability
+- Outputs expose values from inside a module
+- `terraform state mv` allows refactoring without recreating resources
+- API Gateway requires `invoke_arn`, not a standard Lambda ARN
+- Always run `terraform plan` after state operations
+
+### Exercises
+
+- Refactor Lambda resources into a reusable module
+- Migrate existing resources using `terraform state mv`
+- Expose and consume module outputs
+
 ## Current Infrastructure
 
 ### AWS Resources
@@ -970,7 +994,6 @@ Split into multiple Lambdas when:
 
 ### Next Milestones
 
-- Terraform Modules
 - Remote Terraform State
 - CI/CD Pipelines
 - Dead Letter Queues
