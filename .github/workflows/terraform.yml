@@ -45,7 +45,9 @@ jobs:
 
       - name: Build Lambda Package
         working-directory: lambda
-        run: ./build.sh
+        run: |
+          chmod +x build.sh
+          ./build.sh
 
       - name: Terraform Init
         run: terraform init
