@@ -35,6 +35,18 @@ jobs:
           role-to-assume: arn:aws:iam::941141115076:role/github-actions-terraform
           aws-region: us-east-1
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Build Lambda Package
+        working-directory: lambda
+        run: ./build.sh
+
       - name: Terraform Init
         run: terraform init
 
