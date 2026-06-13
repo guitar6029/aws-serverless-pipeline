@@ -5,6 +5,7 @@ terraform {
     key            = "aws-serverless-pipeline/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "terraform-locks"
+    # use_lockfile = true
   }
 
 
