@@ -1019,10 +1019,22 @@ Split into multiple Lambdas when:
 - Different business domains
 - Different scaling requirements
 
+### Completed Milestones
+
+- Terraform Infrastructure as Code
+- Remote State Backend with Locking
+- Serverless Data Ingestion Pipeline
+- GitHub Actions CI Pipeline
+- GitHub Actions CD Pipeline
+- OIDC Authentication Between GitHub and AWS
+- Branch Protection and Deployment Gates
+
 ### Next Milestones
 
-- CI/CD Pipelines
 - Dead Letter Queues
 - CSV Aggregation and Reporting
 - Authentication and Authorization
 - API Versioning
+- Docker Containerization
+- Kubernetes Fundamentals
+- Java / Spring Boot Service Integration
