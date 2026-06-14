@@ -1,0 +1,61 @@
+name: Terraform Deploy
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        permissions:
+            # GitHub -> Allowed to generate OIDC token
+            id-token: write
+            # Workflow -> Can read repository contents
+            contents: read
+
+        environment:
+            name: production
+
+        defaults:
+            run:
+                working-directory: terraform
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Setup Python
+              uses: actions/setup-python@v5
+
+              with:
+                  python-version: "3.12"
+
+            - name: Install uv
+              run: pip install uv
+
+            - name: Build Lambda Package
+              run: |
+                  chmod +x ../lambda/build.sh
+                  cd ../lambda
+                  ./build.sh
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v4
+
+              with:
+                  role-to-assume: arn:aws:iam::941141115076:role/github-actions-terraform
+                  aws-region: us-east-1
+
+            - name: Terraform Init
+              run: terraform init
+
+            - name: Terraform Plan
+              run: terraform plan
+
+            - name: Terraform Apply
+              run: terraform apply -auto-approve
