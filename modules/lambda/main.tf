@@ -13,4 +13,13 @@ resource "aws_lambda_function" "this" {
 
     timeout = 5
     memory_size = 128
+
+    dynamic "dead_letter_config" {
+  for_each = var.dead_letter_target_arn != null ? [1] : []
+
+  content {
+    target_arn = var.dead_letter_target_arn
+  }
+}
+
 }

@@ -13,3 +13,8 @@ variable "handler" {
 variable "filename" {
     type = string
 }
+
+variable "dead_letter_target_arn" {
+    type = string
+    default = null
+}

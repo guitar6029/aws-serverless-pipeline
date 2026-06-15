@@ -49,6 +49,31 @@ resource "aws_iam_role_policy" "lambda_s3_read" {
   })
 }
 
+
+resource "aws_iam_role_policy" "lambda_sqs_dlq" {
+  name = "lambda-sqs-dlq"
+
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "sqs:SendMessage"
+        ]
+
+        Resource = [
+          aws_sqs_queue.ingestion_dlq.arn
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy" "lambda_dynamodb_write" {
   name = "lambda-dynamodb-write"
 
