@@ -44,3 +44,18 @@ resource "aws_lambda_permission" "allow_payments_api" {
 
   source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
 }
+
+
+# reports
+resource "aws_lambda_permission" "allow_reports_api" {
+  statement_id = "AllowExecutionFromAPIGateway"
+
+  action = "lambda:InvokeFunction"
+
+  function_name = module.reports_api.function_name
+
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
+
+}
