@@ -1,0 +1,3 @@
+payment_id,client,amount,date,status
+1,Acme,100,2026-06-14,paid
+2,Acme,INVALID_AMOUNT,2026-06-14,paid

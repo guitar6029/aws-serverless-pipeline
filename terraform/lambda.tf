@@ -4,6 +4,8 @@ module "demo_lambda" {
   role_arn      = aws_iam_role.lambda_role.arn
   handler       = "ingestion_handler.handler"
   filename      = "../lambda/handler.zip"
+
+  dead_letter_target_arn = aws_sqs_queue.ingestion_dlq.arn
 }
 
 resource "aws_lambda_permission" "allow_s3" {
