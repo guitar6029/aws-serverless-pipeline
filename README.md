@@ -975,7 +975,23 @@ Results:
 
 This pattern provides fault isolation, operational visibility, and a foundation for future reprocessing workflows.
 
+---
 
+### Reporting Endpoint
+
+The reporting API currently computes aggregates by performing a full DynamoDB table scan and calculating totals at request time.
+
+This approach is acceptable for learning purposes and small datasets, but it would not scale well in a production environment. As the number of records grows, full table scans become increasingly expensive and introduce higher response latency.
+
+Future improvements may include:
+
+* Pre-computed summary records
+* Event-driven aggregate updates during ingestion
+* Scheduled aggregation jobs
+* Cached reporting views
+* Materialized reporting tables optimized for analytics workloads
+
+The current implementation was intentionally chosen to demonstrate DynamoDB access patterns, aggregation logic, and API-driven reporting before introducing more advanced optimization strategies.
 
 
 ---
@@ -1075,10 +1091,10 @@ Split into multiple Lambdas when:
 * SQS Dead Letter Queue (DLQ)
 * Lambda Failure Handling and Retry Policies
 * CloudWatch Monitoring and Error Tracing
-
+* CSV Aggregation and Reporting
+  
 ### Next Milestones
 
-* CSV Aggregation and Reporting
 * Authentication and Authorization
 * API Versioning
 * Docker Containerization
