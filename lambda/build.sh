@@ -28,6 +28,9 @@ cp -r utils build/
 #payments-api
 cp -r payments_api_handler.py build/
 
+#reports_api
+cp -r reports_api_handler.py build/
+
 echo "Creating deployment package..."
 
 cd build
