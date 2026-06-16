@@ -955,11 +955,11 @@ S3 Upload
 
 ### Implementation
 
-* Created an SQS queue (`ingestion-dlq`) using Terraform
-* Extended the reusable Lambda Terraform module with optional DLQ support
-* Added IAM permissions allowing the ingestion Lambda to send messages to SQS
-* Configured Lambda asynchronous invocation retries
-* Captured failed ingestion events for later inspection and reprocessing
+- Created an SQS queue (`ingestion-dlq`) using Terraform
+- Extended the reusable Lambda Terraform module with optional DLQ support
+- Added IAM permissions allowing the ingestion Lambda to send messages to SQS
+- Configured Lambda asynchronous invocation retries
+- Captured failed ingestion events for later inspection and reprocessing
 
 ### Validation
 
@@ -967,11 +967,11 @@ A test CSV containing an invalid payment amount was uploaded to S3.
 
 Results:
 
-* Lambda invocation failed with a Decimal conversion exception
-* Error was recorded in CloudWatch Logs
-* Lambda retried automatically
-* Failed event was delivered to the Dead Letter Queue
-* Original error details were preserved for troubleshooting
+- Lambda invocation failed with a Decimal conversion exception
+- Error was recorded in CloudWatch Logs
+- Lambda retried automatically
+- Failed event was delivered to the Dead Letter Queue
+- Original error details were preserved for troubleshooting
 
 This pattern provides fault isolation, operational visibility, and a foundation for future reprocessing workflows.
 
@@ -985,14 +985,13 @@ This approach is acceptable for learning purposes and small datasets, but it wou
 
 Future improvements may include:
 
-* Pre-computed summary records
-* Event-driven aggregate updates during ingestion
-* Scheduled aggregation jobs
-* Cached reporting views
-* Materialized reporting tables optimized for analytics workloads
+- Pre-computed summary records
+- Event-driven aggregate updates during ingestion
+- Scheduled aggregation jobs
+- Cached reporting views
+- Materialized reporting tables optimized for analytics workloads
 
 The current implementation was intentionally chosen to demonstrate DynamoDB access patterns, aggregation logic, and API-driven reporting before introducing more advanced optimization strategies.
-
 
 ---
 
@@ -1081,23 +1080,22 @@ Split into multiple Lambdas when:
 
 ### Completed Milestones
 
-* Terraform Infrastructure as Code
-* Remote State Backend with Locking
-* Serverless Data Ingestion Pipeline
-* GitHub Actions CI Pipeline
-* GitHub Actions CD Pipeline
-* OIDC Authentication Between GitHub and AWS
-* Branch Protection and Deployment Gates
-* SQS Dead Letter Queue (DLQ)
-* Lambda Failure Handling and Retry Policies
-* CloudWatch Monitoring and Error Tracing
-* CSV Aggregation and Reporting
-  
+- Terraform Infrastructure as Code
+- Remote State Backend with Locking
+- Serverless Data Ingestion Pipeline
+- GitHub Actions CI Pipeline
+- GitHub Actions CD Pipeline
+- OIDC Authentication Between GitHub and AWS
+- Branch Protection and Deployment Gates
+- SQS Dead Letter Queue (DLQ)
+- Lambda Failure Handling and Retry Policies
+- CloudWatch Monitoring and Error Tracing
+- CSV Aggregation and Reporting
+
 ### Next Milestones
 
-* Authentication and Authorization
-* API Versioning
-* Docker Containerization
-* Kubernetes Fundamentals
-* Java / Spring Boot Service Integration
-
+- Authentication and Authorization
+- API Versioning
+- Docker Containerization
+- Kubernetes Fundamentals
+- Java / Spring Boot Service Integration
