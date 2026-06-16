@@ -25,8 +25,11 @@ cp -r processors build/
 cp -r repositories build/
 cp -r utils build/
 
-#payments-api
+#payments-api v1
 cp -r payments_api_handler.py build/
+
+#payments-api v2
+cp -r payments_api_v2_handler.py build/
 
 #reports_api
 cp -r reports_api_handler.py build/
