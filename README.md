@@ -995,6 +995,37 @@ The current implementation was intentionally chosen to demonstrate DynamoDB acce
 
 ---
 
+## Reporting API
+
+A reporting endpoint was added to demonstrate aggregation and analytics patterns over DynamoDB data.
+
+Current implementation:
+
+* GET `/reports`
+* Reads payment records from DynamoDB
+* Uses a DynamoDB Scan operation
+* Aggregates totals by status (`paid`, `pending`, `failed`)
+* Returns payment counts and monetary totals
+
+### Production Considerations
+
+The current implementation uses a full table scan for learning purposes.
+
+This approach is acceptable for small datasets but becomes inefficient as table size grows.
+
+Future improvements may include:
+
+* Precomputed aggregates
+* Materialized summary tables
+* Event-driven updates via Lambda
+* DynamoDB Streams
+* Scheduled aggregation jobs
+* Cached reporting endpoints
+
+The goal is to evolve from on-demand computation toward incremental computation where only changed records trigger aggregate updates.
+
+---
+
 ## Key Concepts Learned
 
 - Terraform State Management
@@ -1091,10 +1122,10 @@ Split into multiple Lambdas when:
 - Lambda Failure Handling and Retry Policies
 - CloudWatch Monitoring and Error Tracing
 - CSV Aggregation and Reporting
-
+- Authentication and Authorization
+  
 ### Next Milestones
 
-- Authentication and Authorization
 - API Versioning
 - Docker Containerization
 - Kubernetes Fundamentals
