@@ -100,6 +100,31 @@ resource "aws_iam_role_policy" "lambda_dynamodb_write" {
 }
 
 # REPORTS API ROLE
+
+
+resource "aws_iam_role_policy" "reports_api_dynamodb_read" {
+  name = "reports-api-dynamodb-read"
+
+  role = aws_iam_role.reports_api_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        # "dynamodb:GetItem",
+        "dynamodb:Scan",
+        # "dynamodb:Query"
+      ]
+      Resource = [
+        aws_dynamodb_table.payments.arn,
+        "${aws_dynamodb_table.payments.arn}/index/*"
+      ]
+    }]
+  })
+}
+
+
 resource "aws_iam_role" "reports_api_role" {
   name = "reports-api-role"
   assume_role_policy = jsonencode({
