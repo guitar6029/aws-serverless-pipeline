@@ -25,6 +25,7 @@ resource "aws_lambda_permission" "allow_s3" {
 
 }
 
+# version 1 payments_api_v1
 module "payments_api" {
   source        = "../modules/lambda"
   function_name = "payments-api"
@@ -33,8 +34,17 @@ module "payments_api" {
   filename      = "../lambda/handler.zip"
 }
 
+# version 2 payments_api_v2
+module "payments_api_v2" {
+  source        = "../modules/lambda"
+  function_name = "payments-api-v2"
+  role_arn      = aws_iam_role.payments_api_role.arn
+  handler       = "payments_api_v2_handler.handler"
+  filename      = "../lambda/handler.zip"
+}
+
 resource "aws_lambda_permission" "allow_payments_api" {
-  statement_id = "AllowExecutionFromAPIGateway"
+  statement_id = "AllowPaymentsExecutionFromAPIGateway"
 
   action = "lambda:InvokeFunction"
 
@@ -45,10 +55,23 @@ resource "aws_lambda_permission" "allow_payments_api" {
   source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
 }
 
+#v2 payments api
+resource "aws_lambda_permission" "allow_payments_api_v2" {
+  statement_id = "AllowPaymentsExecutionFromAPIGatewayV2"
+
+  action = "lambda:InvokeFunction"
+
+  function_name = module.payments_api_v2.function_name
+
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
+}
+
 
 # reports
 resource "aws_lambda_permission" "allow_reports_api" {
-  statement_id = "AllowExecutionFromAPIGateway"
+  statement_id = "AllowReportsExecutionFromAPIGateway"
 
   action = "lambda:InvokeFunction"
 
