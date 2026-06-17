@@ -37,7 +37,12 @@ resource "aws_api_gateway_deployment" "payments" {
       aws_api_gateway_integration.get_payment_v2.id,
 
       # cognito authorizer
-      aws_api_gateway_authorizer.cognito.id
+      aws_api_gateway_authorizer.cognito.id,
+
+
+      # POST PAYMENT
+      aws_api_gateway_method.post_payment.id,
+      aws_api_gateway_integration.post_payment.id,
     ]))
   }
 
