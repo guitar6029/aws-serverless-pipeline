@@ -1,7 +1,7 @@
 import json
 from repositories.payments import get_payment, list_payments
-from utils.payment_filters import parse_payment_filters
-from utils.payment_response import payment_to_response
+from utils.payments.payment_filters import parse_payment_filters
+from utils.payments.payment_response_v1 import payment_to_response_v1
 
 # def handler(event, context):
 #     raise Exception("Tesing alarm!")
@@ -23,7 +23,7 @@ def handler(event, context):
                 "body": json.dumps({"message": "Payment not found"}),
             }
 
-        response = payment_to_response(payment)
+        response = payment_to_response_v1(payment)
 
         return {"statusCode": 200, "body": json.dumps(response)}
     else:
@@ -43,7 +43,7 @@ def handler(event, context):
         last_key = result["last_key"]
 
         response = {
-            "items": [payment_to_response(payment) for payment in items],
+            "items": [payment_to_response_v1(payment) for payment in items],
             "last_key": last_key,
         }
 
