@@ -1,4 +1,4 @@
-def payment_to_response(payment: dict) -> dict:
+def payment_to_response_v1(payment: dict) -> dict:
     return {
         "payment_id": payment["payment_id"],
         "amount": float(payment["amount"]),
