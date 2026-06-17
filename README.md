@@ -1042,6 +1042,36 @@ Changes:
 - Cognito authorization required
 - Backward compatibility maintained
 
+# API Versioning Notes
+
+## Why version?
+
+Avoid breaking existing clients.
+
+## Example
+
+V1:
+{
+payment_id,
+amount,
+client,
+status
+}
+
+V2:
+{
+payment_id,
+amount,
+client,
+status,
+currency
+}
+
+## Key Lesson
+
+Keep storage unchanged when possible.
+Version API contracts, not necessarily databases.
+
 ---
 
 ## Key Concepts Learned
@@ -1087,6 +1117,10 @@ Changes:
 - Thresholds
 - Evaluation Periods
 - Monitoring Production Failures
+- Deployment snapshots
+- API versioning
+- Backward compatibility
+- Contract evolution
 
 ### Infrastructure Drift
 
