@@ -1001,11 +1001,11 @@ A reporting endpoint was added to demonstrate aggregation and analytics patterns
 
 Current implementation:
 
-* GET `/reports`
-* Reads payment records from DynamoDB
-* Uses a DynamoDB Scan operation
-* Aggregates totals by status (`paid`, `pending`, `failed`)
-* Returns payment counts and monetary totals
+- GET `/reports`
+- Reads payment records from DynamoDB
+- Uses a DynamoDB Scan operation
+- Aggregates totals by status (`paid`, `pending`, `failed`)
+- Returns payment counts and monetary totals
 
 ### Production Considerations
 
@@ -1015,14 +1015,32 @@ This approach is acceptable for small datasets but becomes inefficient as table 
 
 Future improvements may include:
 
-* Precomputed aggregates
-* Materialized summary tables
-* Event-driven updates via Lambda
-* DynamoDB Streams
-* Scheduled aggregation jobs
-* Cached reporting endpoints
+- Precomputed aggregates
+- Materialized summary tables
+- Event-driven updates via Lambda
+- DynamoDB Streams
+- Scheduled aggregation jobs
+- Cached reporting endpoints
 
 The goal is to evolve from on-demand computation toward incremental computation where only changed records trigger aggregate updates.
+
+---
+
+### API Versioning
+
+V1:
+GET /payments
+GET /payments/{payment_id}
+
+V2:
+GET /v2/payments
+GET /v2/payments/{payment_id}
+
+Changes:
+
+- Added currency field to payment responses
+- Cognito authorization required
+- Backward compatibility maintained
 
 ---
 
@@ -1123,7 +1141,7 @@ Split into multiple Lambdas when:
 - CloudWatch Monitoring and Error Tracing
 - CSV Aggregation and Reporting
 - Authentication and Authorization
-  
+
 ### Next Milestones
 
 - API Versioning
