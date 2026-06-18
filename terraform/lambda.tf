@@ -16,16 +16,6 @@ module "reports_api" {
   filename      = "../lambda/handler.zip"
 }
 
-resource "aws_lambda_permission" "allow_s3" {
-  statement_id  = "AllowExecutionFromS3"
-  action        = "lambda:InvokeFunction"
-  function_name = module.demo_lambda.function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.demo.arn
-
-}
-
-# version 1 payments_api_v1
 module "payments_api" {
   source        = "../modules/lambda"
   function_name = "payments-api"
@@ -51,64 +41,10 @@ module "payment_worker" {
 }
 
 
-# version 2 payments_api_v2
 module "payments_api_v2" {
   source        = "../modules/lambda"
   function_name = "payments-api-v2"
   role_arn      = aws_iam_role.payments_api_role.arn
   handler       = "payments_api_v2_handler.handler"
   filename      = "../lambda/handler.zip"
-}
-
-resource "aws_lambda_permission" "allow_payments_api" {
-  statement_id = "AllowPaymentsExecutionFromAPIGateway"
-
-  action = "lambda:InvokeFunction"
-
-  function_name = module.payments_api.function_name
-
-  principal = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
-}
-
-# allow create payment
-resource "aws_lambda_permission" "allow_create_payment_api" {
-  statement_id = "AllowCreatePaymentExecutionFromAPIGateway"
-
-  action = "lambda:InvokeFunction"
-
-  function_name = module.create_payment_api.function_name
-
-  principal = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
-}
-
-#v2 payments api
-resource "aws_lambda_permission" "allow_payments_api_v2" {
-  statement_id = "AllowPaymentsExecutionFromAPIGatewayV2"
-
-  action = "lambda:InvokeFunction"
-
-  function_name = module.payments_api_v2.function_name
-
-  principal = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
-}
-
-
-# reports
-resource "aws_lambda_permission" "allow_reports_api" {
-  statement_id = "AllowReportsExecutionFromAPIGateway"
-
-  action = "lambda:InvokeFunction"
-
-  function_name = module.reports_api.function_name
-
-  principal = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
-
 }
