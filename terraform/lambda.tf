@@ -42,6 +42,14 @@ module "create_payment_api" {
   filename      = "../lambda/handler.zip"
 }
 
+module "payment_worker" {
+  source        = "../modules/lambda"
+  function_name = "payment-worker"
+  role_arn      = aws_iam_role.payment_worker_role.arn
+  handler       = "payment_worker_handler.handler"
+  filename      = "../lambda/handler.zip"
+}
+
 
 # version 2 payments_api_v2
 module "payments_api_v2" {
