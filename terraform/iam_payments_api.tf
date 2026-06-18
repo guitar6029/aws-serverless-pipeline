@@ -44,7 +44,6 @@ resource "aws_iam_role_policy" "payments_api_dynamodb_read" {
   })
 }
 
-
 # write only
 resource "aws_iam_role_policy" "payments_api_dynamodb_write" {
   name = "payments-api-dynamodb-write"
@@ -65,4 +64,21 @@ resource "aws_iam_role_policy" "payments_api_dynamodb_write" {
     }]
   })
 
+}
+
+resource "aws_iam_role_policy" "payments_api_sqs_write" {
+  name = "payments-api-sqs-write"
+  role = aws_iam_role.payments_api_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "sqs:SendMessage"
+      ]
+      Resource = [
+        aws_sqs_queue.payment_creation_queue.arn
+      ]
+    }]
+  })
 }
