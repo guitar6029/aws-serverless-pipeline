@@ -2,13 +2,23 @@ import boto3
 from boto3.dynamodb.conditions import Attr, Key
 from botocore.exceptions import ClientError
 from models.payment_filter import PaymentFilters
+from models.create_payment_request import CreatePaymentRequest
 from time import time
+import json
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("payments")
 
+sqs = boto3.client("sqs")
 
-def add_payment(req_payment):
+QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/941141115076/payment-creation-queue"
+
+
+def enqueue_payment(payment):
+    sqs.send_message(QueueUrl=QUEUE_URL, MessageBody=json.dumps(payment, default=str))
+
+
+def create_payment_dict(req_payment: CreatePaymentRequest) -> dict:
     payment = {
         "payment_id": int(time() * 1000),
         "amount": req_payment.amount,
@@ -17,6 +27,10 @@ def add_payment(req_payment):
         "status": req_payment.status.value,
     }
 
+    return payment
+
+
+def add_payment_to_db(payment) -> dict:
     try:
         table.put_item(Item=payment)
     except ClientError:
@@ -24,6 +38,7 @@ def add_payment(req_payment):
     return payment
 
 
+# TODO Split the logic , create payment dict, and then create def for saving
 def save_payment(payment):
     item = {
         "payment_id": payment.payment_id,
