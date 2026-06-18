@@ -34,6 +34,23 @@ module "payments_api" {
   filename      = "../lambda/handler.zip"
 }
 
+module "create_payment_api" {
+  source        = "../modules/lambda"
+  function_name = "create-payment-api"
+  role_arn      = aws_iam_role.payments_api_role.arn
+  handler       = "create_payment_handler.handler"
+  filename      = "../lambda/handler.zip"
+}
+
+module "payment_worker" {
+  source        = "../modules/lambda"
+  function_name = "payment-worker"
+  role_arn      = aws_iam_role.payment_worker_role.arn
+  handler       = "payment_worker_handler.handler"
+  filename      = "../lambda/handler.zip"
+}
+
+
 # version 2 payments_api_v2
 module "payments_api_v2" {
   source        = "../modules/lambda"
@@ -49,6 +66,19 @@ resource "aws_lambda_permission" "allow_payments_api" {
   action = "lambda:InvokeFunction"
 
   function_name = module.payments_api.function_name
+
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.payments.execution_arn}/*"
+}
+
+# allow create payment
+resource "aws_lambda_permission" "allow_create_payment_api" {
+  statement_id = "AllowCreatePaymentExecutionFromAPIGateway"
+
+  action = "lambda:InvokeFunction"
+
+  function_name = module.create_payment_api.function_name
 
   principal = "apigateway.amazonaws.com"
 
