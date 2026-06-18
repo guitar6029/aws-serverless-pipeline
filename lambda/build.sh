@@ -31,6 +31,9 @@ cp -r payments_api_handler.py build/
 #payments-api v2
 cp -r payments_api_v2_handler.py build/
 
+# create payment
+cp -r create_payment_handler.py build/
+
 #reports_api
 cp -r reports_api_handler.py build/
 

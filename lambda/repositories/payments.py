@@ -1,9 +1,27 @@
 import boto3
 from boto3.dynamodb.conditions import Attr, Key
+from botocore.exceptions import ClientError
 from models.payment_filter import PaymentFilters
+from time import time
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("payments")
+
+
+def add_payment(req_payment):
+    payment = {
+        "payment_id": int(time() * 1000),
+        "amount": req_payment.amount,
+        "client": req_payment.client,
+        "date": str(req_payment.date),
+        "status": req_payment.status.value,
+    }
+
+    try:
+        table.put_item(Item=payment)
+    except ClientError:
+        raise
+    return payment
 
 
 def save_payment(payment):
