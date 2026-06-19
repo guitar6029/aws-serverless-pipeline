@@ -640,6 +640,90 @@ Learned:
 - Different application layers often require different data representations
 - Response mapping improves maintainability and separation of concerns
 
+
+
+## Event-Driven Payment Processing
+
+To improve scalability and decouple API requests from database writes, payment creation was migrated from a synchronous workflow to an asynchronous event-driven architecture using Amazon SQS.
+
+### Previous Architecture
+
+```
+Client
+    ↓
+API Gateway
+    ↓
+Create Payment Lambda
+    ↓
+DynamoDB
+```
+
+In this design, API requests directly wrote to DynamoDB. While simple, the API became responsible for validation, persistence, and error handling within a single request cycle.
+
+### Current Architecture
+
+```
+Client
+    ↓
+API Gateway
+    ↓
+Create Payment Lambda
+    ↓
+Amazon SQS
+    ↓
+Payment Worker Lambda
+    ↓
+DynamoDB
+```
+
+### Flow
+
+1. Client submits a payment creation request.
+2. API Gateway invokes the Create Payment Lambda.
+3. Request body is validated using Pydantic.
+4. A payment message is created and published to Amazon SQS.
+5. The API immediately returns `202 Accepted`.
+6. SQS invokes the Payment Worker Lambda through an Event Source Mapping.
+7. The worker processes the message and persists the payment record to DynamoDB.
+
+### IAM Design
+
+Separate IAM roles were created for each workload:
+
+**Payments API Role**
+
+* DynamoDB Read
+* DynamoDB Write
+* SQS SendMessage
+
+**Payment Worker Role**
+
+* DynamoDB PutItem
+* AWSLambdaBasicExecutionRole
+* AWSLambdaSQSQueueExecutionRole
+
+This follows the Principle of Least Privilege by granting only the permissions required for each workload.
+
+### Lessons Learned
+
+* Event Source Mappings automatically connect SQS queues to Lambda functions.
+* SQS consumers require queue execution permissions.
+* API Gateway and SQS invoke Lambda differently.
+* Queue-based architectures help absorb traffic spikes.
+* CloudWatch logs are essential when debugging distributed workflows.
+* JSON serialization differs from DynamoDB persistence requirements.
+* Decimal values require special handling when serializing queue messages.
+
+### Benefits
+
+* Decoupled API and persistence layers
+* Improved scalability
+* Better fault isolation
+* Retry support through SQS
+* Foundation for future DLQ and reprocessing workflows
+
+
+
 ## API Gateway
 
 ### Resources
@@ -1175,10 +1259,17 @@ Split into multiple Lambdas when:
 - CloudWatch Monitoring and Error Tracing
 - CSV Aggregation and Reporting
 - Authentication and Authorization
+- API Versioning
+- Event-Driven Payment Processing
+- SQS Queue Integration
+- Lambda Worker Processing
+
 
 ### Next Milestones
 
-- API Versioning
 - Docker Containerization
 - Kubernetes Fundamentals
 - Java / Spring Boot Service Integration
+- SNS Event Notifications
+- DynamoDB Streams
+- Advanced Monitoring & Observability
