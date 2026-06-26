@@ -1,6 +1,8 @@
 # AWS Serverless Pipeline
 
-Learning project focused on Terraform, AWS fundamentals, and serverless architecture.
+Learning project focused on Terraform, AWS, Docker, and modern cloud-native backend development.
+
+Originally created to explore AWS serverless architecture, this repository is gradually evolving into the foundation for a larger cloud-native engineering platform.
 
 ## Goals
 
@@ -1158,6 +1160,42 @@ Version API contracts, not necessarily databases.
 
 ---
 
+# Docker Fundamentals
+
+To prepare for Kubernetes and modern backend deployment workflows, a dedicated Docker learning section was introduced.
+
+The Docker examples are intentionally isolated under:
+
+learning/
+└── docker-experiments/
+
+These exercises focus on understanding Docker concepts before integrating containerization into production services.
+
+## Topics Covered
+
+- Docker Images
+- Docker Containers
+- Dockerfiles
+- Multi-stage Builds
+- Docker Compose
+- Volumes
+- Bind Mounts
+- Environment Variables
+- Networking
+- Redis Containers
+- Background Worker Containers
+- Logging
+- Image Layer Caching
+
+## Purpose
+
+The Docker learning environment is separate from the primary AWS serverless project.
+
+Once sufficient proficiency is reached, Docker concepts will be applied directly to future platform services.
+
+
+---
+
 ## Key Concepts Learned
 
 - Terraform State Management
@@ -1263,13 +1301,58 @@ Split into multiple Lambdas when:
 - Event-Driven Payment Processing
 - SQS Queue Integration
 - Lambda Worker Processing
+- Docker Fundamentals
+- Docker Compose
+- Redis Container Integration
+- Background Worker Container
+- Multi-stage Docker Builds
 
+## Next Milestones
 
-### Next Milestones
+### Foundation
 
-- Docker Containerization
+- Java Fundamentals Refresh
+- Spring Boot Fundamentals
+- Spring REST APIs
+- Spring Data JPA
+- Spring Security
+
+### Platform Evolution
+
+- Repository Architecture
+- Monorepo Organization
+- Fleet Platform Design
+- Domain Modeling
+
+### Cloud Native
+
 - Kubernetes Fundamentals
-- Java / Spring Boot Service Integration
+- Service Deployment
+- Container Orchestration
+- Observability
+- Metrics and Logging
+
+### AWS
+
 - SNS Event Notifications
 - DynamoDB Streams
-- Advanced Monitoring & Observability
+- Event-Driven Expansion
+
+## Long-Term Vision
+
+This repository began as a focused AWS Serverless learning project.
+
+As additional technologies are learned, the repository will gradually evolve into a larger cloud-native backend platform.
+
+Planned technologies include:
+
+- Java
+- Spring Boot
+- Docker
+- Kubernetes
+- Redis
+- PostgreSQL
+- Distributed Services
+- Observability
+
+The long-term objective is to build a production-inspired telemetry platform capable of processing fleet data, managing customers, handling billing, and demonstrating modern cloud-native architecture.
