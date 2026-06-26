@@ -1,0 +1,4 @@
+services:
+  hog:
+    build: .
+    mem_limit: 100m
