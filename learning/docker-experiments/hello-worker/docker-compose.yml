@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    command: python api.py
+    ports:
+      - "8000:8000"
+
+  worker:
+    build: .
+    command: python worker.py
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5

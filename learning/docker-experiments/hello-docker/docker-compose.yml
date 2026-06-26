@@ -1,0 +1,33 @@
+services:
+  hello:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: always
+    env_file:
+      - .env
+    environment:
+      SERVICE_NAME: ${HELLO_SERVICE_NAME}
+
+  hello2:
+    build:
+      context: .
+      dockerfile: Dockerfile2
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    environment:
+      SERVICE_NAME: ${HELLO2_SERVICE_NAME}
+
+  writer:
+    build:
+      context: .
+      dockerfile: Dockerfile3
+    volumes:
+      - writer-data:/data
+
+volumes:
+  writer-data:

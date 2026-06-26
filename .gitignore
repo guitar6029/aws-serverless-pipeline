@@ -32,3 +32,5 @@ lambda/build/
 __pycache__/
 *.pyc
 build/
+
+.env*
