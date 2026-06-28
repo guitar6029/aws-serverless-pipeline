@@ -3,11 +3,19 @@ name: Terraform CI
 on:
   push:
     branches:
-      - feature/cicd
+      - main
+    paths:
+      - terraform/**
+      - lambda/**
+      - .github/workflows/terraform.yml
 
   pull_request:
     branches:
       - main
+    paths:
+      - terraform/**
+      - lambda/**
+      - .github/workflows/terraform.yml
 
 jobs:
   terraform:
