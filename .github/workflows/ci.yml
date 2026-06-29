@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+
+    outputs:
+      terraform_changed: ${{ steps.check-terraform.outputs.changed }}
+      spring_changed: ${{ steps.check-spring.outputs.changed }}
+      github_learning_changed: ${{steps.check-github-learning.outputs.changed}}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Terraform changes
+        id: check-terraform
+        shell: bash
+        run: |
+          if git diff --quiet HEAD~1 HEAD -- terraform/ lambda/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check Spring changes
+        id: check-spring
+        shell: bash
+        run: |
+          if git diff --quiet HEAD~1 HEAD -- learning/java-spring/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check Github Learning changes
+        id: check-github-learning
+        shell: bash
+        run: |
+          if git diff --quiet HEAD~1 HEAD -- learning/github-actions-learning/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  terraform:
+    needs: detect-changes
+
+    if: needs.detect-changes.outputs.terraform_changed == 'true'
+
+    uses: ./.github/workflows/terraform.yml
