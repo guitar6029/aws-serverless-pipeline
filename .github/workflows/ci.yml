@@ -25,10 +25,30 @@ jobs:
       - name: Check Terraform changes
         id: check-terraform
         shell: bash
+
+        # run: |
+        #   if git diff --quiet HEAD~1 HEAD -- terraform/ lambda/; then
+        #     echo "changed=false" >> "$GITHUB_OUTPUT"
+        #   else
+        #     echo "changed=true" >> "$GITHUB_OUTPUT"
+        #   fi
+
         run: |
+          echo "===== COMMITS ====="
+          git log --oneline -5
+
+          echo ""
+          echo "===== CHANGED FILES ====="
+          git diff --name-only HEAD~1 HEAD
+
+          echo ""
+          echo "===== TERRAFORM DIFF ====="
+
           if git diff --quiet HEAD~1 HEAD -- terraform/ lambda/; then
+            echo "No terraform changes"
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
+            echo "Terraform changes detected"
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
