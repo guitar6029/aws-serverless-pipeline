@@ -1,9 +1,17 @@
 package com.joshdev.telemetrydemo.dto.drone;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+
 // traditional way
 public class CreateDroneRequest {
 
+    @NotBlank
     private String name;
+
+    @Min(0)
+    @Max(100)
     private int battery;
 
     public CreateDroneRequest() {
