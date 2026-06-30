@@ -34,3 +34,15 @@ __pycache__/
 build/
 
 .env*
+
+
+# Maven
+target/
+
+# Maven Wrapper (keep these!)
+!.mvn/wrapper/maven-wrapper.properties
+!.mvn/wrapper/maven-wrapper.jar
+
+maven-status/
+createdFiles.lst
+inputFiles.lst
