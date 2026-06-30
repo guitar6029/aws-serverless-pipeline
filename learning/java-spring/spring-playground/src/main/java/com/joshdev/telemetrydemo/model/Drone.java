@@ -2,13 +2,15 @@ package com.joshdev.telemetrydemo.model;
 
 public class Drone {
 
-    private String id;
-    private String status;
-    private int battery;
-    private double temperature;
+    private final String name;
+    private final String id;
+    private final String status;
+    private final int battery;
+    private final double temperature;
 
-    public Drone(String id, String status, int battery, double temperature) {
+    public Drone(String id, String name, String status, int battery, double temperature) {
         this.id = id;
+        this.name = name;
         this.status = status;
         this.battery = battery;
         this.temperature = temperature;
@@ -16,7 +18,11 @@ public class Drone {
 
     @Override
     public String toString() {
-        return "Drone\nID: " + id + "\nStatus: " + status + "\nBattery: " + battery + "\nTemperature: " + temperature + "\n";
+        return "Drone\nName:" + name + "\nID: " + id + "\nStatus: " + status + "\nBattery: " + battery + "\nTemperature: " + temperature + "\n";
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getId() {
