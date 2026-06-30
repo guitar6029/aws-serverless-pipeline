@@ -1306,43 +1306,53 @@ Split into multiple Lambdas when:
 - Redis Container Integration
 - Background Worker Container
 - Multi-stage Docker Builds
+- Java Fundamentals Refresh
+- Spring Boot Fundamentals
+- Spring Core (Dependency Injection)
+- Spring REST APIs
+- Bean Validation
+- Global Exception Handling
 
 ## Next Milestones
 
 ### Foundation
-
-- Java Fundamentals Refresh
-- Spring Boot Fundamentals
-- Spring REST APIs
 - Spring Data JPA
+- PostgreSQL
 - Spring Security
+- Redis
 
 ### Platform Evolution
 
+- Fleet Domain Modeling
 - Repository Architecture
 - Monorepo Organization
-- Fleet Platform Design
-- Domain Modeling
+- REST API Expansion
+- Angular Dashboard
 
 ### Cloud Native
 
+- Docker
 - Kubernetes Fundamentals
 - Service Deployment
 - Container Orchestration
 - Observability
 - Metrics and Logging
 
-### AWS
+### Distributed Systems
 
 - SNS Event Notifications
+- SQS Messaging
 - DynamoDB Streams
-- Event-Driven Expansion
+- Event-Driven Architecture
+- Background Workers
+- Distributed Caching
+- Retry Policies
+- Dead Letter Queues
 
 ## Long-Term Vision
 
-This repository began as a focused AWS Serverless learning project.
 
-As additional technologies are learned, the repository will gradually evolve into a larger cloud-native backend platform.
+This repository began as an AWS Serverless learning project. It has since expanded into a long-term engineering project focused on building a production-inspired drone telemetry platform while exploring modern backend, cloud, and distributed systems concepts.
 
 Planned technologies include:
 
@@ -1355,4 +1365,23 @@ Planned technologies include:
 - Distributed Services
 - Observability
 
-The long-term objective is to build a production-inspired telemetry platform capable of processing fleet data, managing customers, handling billing, and demonstrating modern cloud-native architecture.
+
+- Spring Dependency Injection
+- Bean Lifecycle
+- REST Controllers
+- DTO Pattern
+- Bean Validation
+- ResponseEntity
+- Global Exception Handling
+- Service Layer Pattern
+- Java Records
+- Java Enums
+
+
+## Documentation
+
+Additional planning documents are stored under:
+
+docs/
+
+including architecture ideas, feature brainstorming, and long-term planning for the telemetry platform.
