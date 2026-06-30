@@ -4,14 +4,14 @@ public class Drone {
 
     private final String name;
     private final String id;
-    private final String status;
+    private final DroneStatus status;
     private final int battery;
     private final double temperature;
 
-    public Drone(String id, String name, String status, int battery, double temperature) {
+    public Drone(String id, String name, DroneStatus status, int battery, double temperature) {
         this.id = id;
         this.name = name;
-        this.status = status;
+        this.status = DroneStatus.OFFLINE;
         this.battery = battery;
         this.temperature = temperature;
     }
@@ -29,7 +29,7 @@ public class Drone {
         return id;
     }
 
-    public String getStatus() {
+    public DroneStatus getStatus() {
         return status;
     }
 
