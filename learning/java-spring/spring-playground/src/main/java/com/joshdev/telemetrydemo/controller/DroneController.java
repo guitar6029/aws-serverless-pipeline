@@ -1,7 +1,5 @@
 package com.joshdev.telemetrydemo.controller;
 
-import java.util.UUID;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +13,8 @@ import com.joshdev.telemetrydemo.model.Drone;
 import com.joshdev.telemetrydemo.model.EmailClient;
 import com.joshdev.telemetrydemo.service.DroneService;
 import com.joshdev.telemetrydemo.service.TelemetryService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/drones")
@@ -62,34 +62,10 @@ public class DroneController {
 
     @PostMapping
     public Drone createDrone(
-            @RequestBody CreateDroneRequest request
+            @Valid @RequestBody CreateDroneRequest request
     ) {
-        String name = validateName(request.getName());
-        int battery = validateBattery(request.getBattery());
 
-        return new Drone(
-                UUID.randomUUID().toString(),
-                name,
-                "OFFLINE",
-                battery,
-                25.0
-        );
-    }
-
-    // throws InvalidAttributeValueException
-    private String validateName(String name) {
-        if (name.isEmpty() || name.isBlank()) {
-            throw new IllegalArgumentException("Name cannot be empty");
-        }
-        return name;
-    }
-
-    private int validateBattery(int battery) {
-        if (battery > 100 || battery < 0) {
-            throw new IllegalArgumentException("Battery cannot be less than zero or greater than 100");
-        }
-
-        return battery;
+        return droneService.createDrone(request);
     }
 
 }
