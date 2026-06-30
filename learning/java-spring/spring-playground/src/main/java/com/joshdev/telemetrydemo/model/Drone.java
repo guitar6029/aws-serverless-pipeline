@@ -11,7 +11,7 @@ public class Drone {
     public Drone(String id, String name, DroneStatus status, int battery, double temperature) {
         this.id = id;
         this.name = name;
-        this.status = DroneStatus.OFFLINE;
+        this.status = status;
         this.battery = battery;
         this.temperature = temperature;
     }
