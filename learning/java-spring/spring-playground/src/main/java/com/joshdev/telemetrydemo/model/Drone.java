@@ -1,15 +1,26 @@
 package com.joshdev.telemetrydemo.model;
 
+import java.util.UUID;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+
+@Entity
 public class Drone {
 
     private final String name;
-    private final String id;
+
+    @Id
+    @GeneratedValue
+    private UUID id;
+
     private final DroneStatus status;
     private final int battery;
     private final double temperature;
 
-    public Drone(String id, String name, DroneStatus status, int battery, double temperature) {
-        this.id = id;
+    public Drone(String name, DroneStatus status, int battery, double temperature) {
+
         this.name = name;
         this.status = status;
         this.battery = battery;
@@ -25,7 +36,7 @@ public class Drone {
         return name;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
