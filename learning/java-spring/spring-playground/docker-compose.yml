@@ -1,18 +1,18 @@
 services:
-  # app:
-  #   build: .
+  app:
+    build: .
 
-  #   ports:
-  #     - "8080:8080"
+    ports:
+      - "8080:8080"
 
-  #   restart: unless-stopped
+    restart: unless-stopped
 
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+    depends_on:
+      postgres:
+        condition: service_healthy
 
-  #   env_file:
-  #     - .env
+    env_file:
+      - .env
 
   postgres:
     image: postgres:15
