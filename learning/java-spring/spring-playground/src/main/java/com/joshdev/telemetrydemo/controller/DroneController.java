@@ -1,5 +1,7 @@
 package com.joshdev.telemetrydemo.controller;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +35,7 @@ public class DroneController {
     }
 
     @GetMapping("/{id}")
-    public Drone getDrone(@PathVariable String id) {
+    public Drone getDrone(@PathVariable UUID id) {
         return droneService.getDrone(id);
     }
 
