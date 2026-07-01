@@ -9,15 +9,19 @@ import jakarta.persistence.Id;
 @Entity
 public class Drone {
 
-    private final String name;
+    private String name;
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    private final DroneStatus status;
-    private final int battery;
-    private final double temperature;
+    private DroneStatus status;
+    private int battery;
+    private double temperature;
+
+    protected Drone() {
+
+    }
 
     public Drone(String name, DroneStatus status, int battery, double temperature) {
 
