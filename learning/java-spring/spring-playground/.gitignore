@@ -45,3 +45,5 @@ target/
 
 ### Logs ###
 *.log
+
+.env
