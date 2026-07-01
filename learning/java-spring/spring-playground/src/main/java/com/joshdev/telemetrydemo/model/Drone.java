@@ -3,6 +3,8 @@ package com.joshdev.telemetrydemo.model;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
@@ -15,7 +17,9 @@ public class Drone {
     @GeneratedValue
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
     private DroneStatus status;
+
     private int battery;
     private double temperature;
 
