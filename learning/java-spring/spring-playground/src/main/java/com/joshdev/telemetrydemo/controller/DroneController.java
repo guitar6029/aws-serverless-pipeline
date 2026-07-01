@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.joshdev.telemetrydemo.dto.drone.CreateDroneRequest;
+import com.joshdev.telemetrydemo.model.ApiResponse;
 import com.joshdev.telemetrydemo.model.Drone;
 import com.joshdev.telemetrydemo.model.EmailClient;
 import com.joshdev.telemetrydemo.service.DroneService;
@@ -43,12 +44,11 @@ public class DroneController {
     public String getSingleton() {
 
         return """
-        DroneController DroneService: %d
-        TelemetryService DroneService: %d
-        """.formatted(
+                DroneController DroneService: %d
+                TelemetryService DroneService: %d
+                """.formatted(
                 System.identityHashCode(droneService),
-                telemetryService.getDroneServiceId()
-        );
+                telemetryService.getDroneServiceId());
     }
 
     @GetMapping("/ping")
@@ -59,19 +59,19 @@ public class DroneController {
     @GetMapping("/search")
     public String searchDrones(
             @RequestParam String status,
-            @RequestParam int page
-    ) {
+            @RequestParam int page) {
         return "status=%s page%d".formatted(status, page);
     }
 
     @PostMapping
-    public ResponseEntity<Drone> createDrone(
-            @Valid @RequestBody CreateDroneRequest request
-    ) {
+    public ResponseEntity<ApiResponse<Drone>> createDrone(
+            @Valid @RequestBody CreateDroneRequest request) {
 
         Drone drone = droneService.createDrone(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(drone);
+        ApiResponse<Drone> response = new ApiResponse<>(drone, "Drone created successfully");
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }
