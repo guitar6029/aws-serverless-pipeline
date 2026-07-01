@@ -19,16 +19,19 @@ public class DroneService {
     }
 
     public Drone getDrone(UUID id) {
-        return new Drone("example", DroneStatus.ONLINE, 94, 42.5);
+        return droneRepository.findById(id).orElseThrow();
     }
 
     public Drone createDrone(CreateDroneRequest request) {
-        return new Drone(
+
+        Drone drone = new Drone(
                 request.getName(),
                 DroneStatus.OFFLINE,
                 request.getBattery(),
                 25.0
         );
+
+        return droneRepository.save(drone);
     }
 
 }
