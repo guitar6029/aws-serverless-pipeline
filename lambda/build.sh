@@ -15,7 +15,7 @@ echo "Installing dependencies..."
 
 uv export --no-hashes > requirements.txt
 
-uv pip install -r requirements.txt --target build
+uv pip install --python 3.12 -r requirements.txt --target build
 
 echo "Copying source files..."
 

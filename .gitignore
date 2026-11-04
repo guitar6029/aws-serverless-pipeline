@@ -46,3 +46,18 @@ target/
 maven-status/
 createdFiles.lst
 inputFiles.lst
+
+
+# Terraform plan files
+*.tfplan
+*.tfplan.json
+
+# Local Terraform overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+
+!.env.example
+!**/.env.example
